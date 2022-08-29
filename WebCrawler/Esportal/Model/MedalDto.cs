@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace WebCrawler.Esportal.Model;
 
-public class MedalsDto
+public class MedalDto
 {
     [JsonPropertyName("id")]
     public long Id { get; set; }

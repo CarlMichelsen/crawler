@@ -6,8 +6,8 @@ public interface ICrawler
     {
         Started,
         Stopped,
-        AlreadyStarted,
-        AlreadyStopped,
+        CurrentlyStarted,
+        CurrentlyStopped,
         Failure
     }
 

@@ -6,37 +6,24 @@ namespace WebCrawler.Esportal;
 
 public class EsportalCrawler : ICrawler
 {
-    public WebRequestQueue Queue;
+    public EsportalRequestQueue Queue;
     private ProfileRequestConfig _config;
     private Timer? _timer = null;
 
-    private Uri EsportalUri(ProfileRequestConfig config) {
-        var protocol = "https";
-        var host = "esportal.com";
-        var path = "api/user_profile/get";
-        return new Uri($"{protocol}://{host}/{path}?{config.Query()}");
-    }
-
     public EsportalCrawler(ProfileRequestConfig config)
     {
-        Console.WriteLine(EsportalUri(config));
-        Queue = new WebRequestQueue(EsportalUri(config));
-        for (int i = 0; i < 50; i++)
-        {
-            Queue.Push(EsportalUri(config));
-        }
-        
+        Queue = new EsportalRequestQueue();
         _config = config;
     }
 
+    // does the handling
     private async Task<bool> Handler(string content, HttpResponseHeaders headers) {
         try
         {
             var profile = JsonSerializer.Deserialize<ProfileDto>(content);
             if (profile is null) return false;
-
-            Console.WriteLine(profile.Username);
-            await Task.Delay(500);
+            Console.WriteLine("Deserialized!");
+            await Task.Delay(50);
         }
         catch (System.Exception)
         {
@@ -48,26 +35,36 @@ public class EsportalCrawler : ICrawler
 
     public ICrawler.CrawlerResponse Start()
     {
-        if (_timer is not null) return ICrawler.CrawlerResponse.AlreadyStarted;
+        if (_timer is not null) return ICrawler.CrawlerResponse.CurrentlyStarted;
 
-        IWebRequestQueue.HandleQueueItem handleItem = async (string content, HttpResponseHeaders headers) => {
+        // creaet delegate that runs on handler complete
+        IRequestQueue.HandleQueueItem handleItem = async (string content, HttpResponseHeaders headers) => {
             if (content is null) return false;
             return await Handler(content, headers);
         };
 
+        // create delegate that runs on timer (catches throw)
         TimerCallback callback = async(object? obj) => {
             if (obj is null || obj is not EsportalCrawler) throw new InvalidDataException("Time object should be instance of object that implements ICrawler");
             EsportalCrawler val = (EsportalCrawler)obj;
-            await val.Queue.Next(handleItem);
+            try
+            {
+                var success = await val.Queue.HandleNext(handleItem);
+            }
+            catch (System.Exception e)
+            {
+                val.Queue.FinalizeNext(false);
+                Console.WriteLine(e.Message); // handle list item
+            }
         };
 
-        _timer = new(callback, this, TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(2500));
+        _timer = new(callback, this, TimeSpan.Zero, TimeSpan.FromMilliseconds(2200));
         return ICrawler.CrawlerResponse.Started;
     }
 
     public ICrawler.CrawlerResponse Stop()
     {
-        if (_timer is null) return ICrawler.CrawlerResponse.AlreadyStopped;
+        if (_timer is null) return ICrawler.CrawlerResponse.CurrentlyStopped;
         _timer.Dispose();
         _timer = null;
         return ICrawler.CrawlerResponse.Stopped;

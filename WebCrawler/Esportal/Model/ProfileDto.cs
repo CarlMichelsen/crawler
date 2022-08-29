@@ -224,16 +224,16 @@ public class ProfileDto
     public List<OldUsername> OldUsernames { get; set; } = new List<OldUsername>();
 
     [JsonPropertyName("medals")]
-    public MedalsDto? Medals { get; set; }
+    public List<MedalDto> Medals { get; set; } = new List<MedalDto>();
 
     [JsonPropertyName("current_match")]
     public CurrentMatchDto? CurrentMatch { get; set; }
 
     [JsonPropertyName("current_gather_id")]
-    public long CurrentGatherId { get; set; }
+    public long? CurrentGatherId { get; set; }
 
     [JsonPropertyName("current_tournament_lobby")]
-    public long CurrentTournamentLobby { get; set; }
+    public long? CurrentTournamentLobby { get; set; }
 
     //[JsonPropertyName("team")]
     //public null Team { get; set; }
@@ -242,7 +242,7 @@ public class ProfileDto
     //public null NelRegionId { get; set; }
 
     [JsonPropertyName("lemondogs_user_id")]
-    public long LemondogsUserId { get; set; }
+    public long? LemondogsUserId { get; set; }
 
     [JsonPropertyName("match_drops")]
     public List<MatchDropDto> MatchDrops { get; set; } = new List<MatchDropDto>();
@@ -260,5 +260,5 @@ public class ProfileDto
     public int Mission3Progress { get; set; }
 
     [JsonPropertyName("extra_counter")]
-    public ulong ExtraCounter { get; set; }
+    public ulong? ExtraCounter { get; set; }
 }
