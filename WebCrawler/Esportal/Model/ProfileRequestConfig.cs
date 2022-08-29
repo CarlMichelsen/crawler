@@ -13,10 +13,10 @@ public class ProfileRequestConfig
     public bool Lemondogs { get; set;} = false;
     public bool Rank { get; set;} = false;
     public bool MatchDrop { get; set;} = false;
-    public long Underscore { get; set; }
-    public long Id { get; set; }
+    public long Underscore { get; }
+    public long Id { get; }
 
-    public ProfileRequestConfig(long id)
+    private ProfileRequestConfig(long id)
     {
         Underscore = 1661724976679;
         Id = id;
@@ -61,6 +61,3 @@ public class ProfileRequestConfig
         return string.Join("&", queryElements);
     }
 }
-
-//https://esportal.com/api/user_profile/get?_=1661724826904&id=1661724145912&friends=1&username_history=1&medals=1&levels=1&current_match=1&twitch=1&team=1&lemondogs=1&rank=1&match_drop=1
-//https://esportal.com/api/user_profile/get?_=1661724826904&id=122699457&current_match=1&rank=1

@@ -22,13 +22,20 @@ public class EsportalCrawler : ICrawler
         {
             var profile = JsonSerializer.Deserialize<ProfileDto>(content);
             if (profile is null) return false;
-            Console.WriteLine("Deserialized!");
+            Console.WriteLine($"Deserialized {profile.Username} -> {profile.Elo}");
+            var ids = profile.Friends.Select((f) => {
+                var space = Math.Clamp(25-f.Username.Length, 2, 25);
+                return $"{f.Username}{new string(' ', space)}{f.CountryId}";
+            });
+
+            Console.WriteLine(string.Join("\n", ids));
+            
             await Task.Delay(50);
         }
-        catch (System.Exception)
+        catch (System.Exception e)
         {
-            Console.WriteLine(content);
-            throw;
+            Console.WriteLine(e.Message);
+            return false;
         }
         return true;
     }
@@ -58,15 +65,33 @@ public class EsportalCrawler : ICrawler
             }
         };
 
-        _timer = new(callback, this, TimeSpan.Zero, TimeSpan.FromMilliseconds(2200));
+        try
+        {
+            _timer = new(callback, this, TimeSpan.Zero, TimeSpan.FromMilliseconds(2200));
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return ICrawler.CrawlerResponse.Failure;
+        }
+        
         return ICrawler.CrawlerResponse.Started;
     }
 
     public ICrawler.CrawlerResponse Stop()
     {
-        if (_timer is null) return ICrawler.CrawlerResponse.CurrentlyStopped;
-        _timer.Dispose();
-        _timer = null;
+        try
+        {
+            if (_timer is null) return ICrawler.CrawlerResponse.CurrentlyStopped;
+            _timer.Dispose();
+            _timer = null;
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e);
+            return ICrawler.CrawlerResponse.Failure;
+        }
+        
         return ICrawler.CrawlerResponse.Stopped;
     }
 }

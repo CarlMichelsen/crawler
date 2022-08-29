@@ -4,13 +4,18 @@ public abstract class BaseRequestQueue : IRequestQueue
 {
     public async Task<bool> HandleNext(IRequestQueue.HandleQueueItem handler)
     {
+        // get next queue item or return
         Uri? queueItem = await GetNext();
         if (queueItem is null) return false;
+
+        // get httpClient
         var client = ClientFactory();
 
+        // send http request
         var request = new HttpRequestMessage(HttpMethod.Get, queueItem);
         var response = await client.SendAsync(request);
 
+        // read response in stream
         var success = false;
         if (response.IsSuccessStatusCode)
         {
@@ -22,6 +27,7 @@ public abstract class BaseRequestQueue : IRequestQueue
             }
         }
 
+        // handle list item depending on success
         FinalizeNext(success);
         return success;
     }

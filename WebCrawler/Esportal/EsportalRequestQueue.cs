@@ -11,6 +11,12 @@ public class EsportalRequestQueue : BaseRequestQueue
         return new Uri($"{protocol}://{host}/{path}?{config.Query()}");
     }
 
+    public override async Task<Uri?> GetNext()
+    {
+        await Task.Delay(10);
+        return EsportalUri(ProfileRequestConfig.AllTrue(113878688));
+    }
+
     public override void FinalizeNext(bool success)
     {
         if (success)
@@ -21,11 +27,5 @@ public class EsportalRequestQueue : BaseRequestQueue
         {
             Console.WriteLine("Failure!");
         }
-    }
-
-    public override async Task<Uri?> GetNext()
-    {
-        await Task.Delay(10);
-        return EsportalUri(ProfileRequestConfig.AllTrue(113878688));
     }
 }
