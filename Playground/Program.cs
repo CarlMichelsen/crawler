@@ -1,14 +1,13 @@
 ﻿using WebCrawler.Esportal;
-using WebCrawler.Esportal.Model;
 
-var crawler = new EsportalCrawler(ProfileRequestConfig.AllTrue(7476399));
+var crawler = new EsportalCrawler();
 
 Console.WriteLine(crawler.Start());
 
-await Task.Delay(5000);
+//await Task.Delay(5000);
 
-Console.WriteLine(crawler.Stop());
+//Console.WriteLine(crawler.Stop());
 
-Environment.GetEnvironmentVariable("DATABASE");
+Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL"));
 
 Console.ReadLine();

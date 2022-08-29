@@ -7,13 +7,11 @@ namespace WebCrawler.Esportal;
 public class EsportalCrawler : ICrawler
 {
     public EsportalRequestQueue Queue;
-    private ProfileRequestConfig _config;
     private Timer? _timer = null;
 
-    public EsportalCrawler(ProfileRequestConfig config)
+    public EsportalCrawler()
     {
         Queue = new EsportalRequestQueue();
-        _config = config;
     }
 
     // does the handling
@@ -22,13 +20,15 @@ public class EsportalCrawler : ICrawler
         {
             var profile = JsonSerializer.Deserialize<ProfileDto>(content);
             if (profile is null) return false;
-            Console.WriteLine($"Deserialized {profile.Username} -> {profile.Elo}");
-            var ids = profile.Friends.Select((f) => {
-                var space = Math.Clamp(25-f.Username.Length, 2, 25);
-                return $"{f.Username}{new string(' ', space)}{f.CountryId}";
-            });
 
-            Console.WriteLine(string.Join("\n", ids));
+            foreach (var friend in profile.Friends)
+            {
+                if (!Queue.IdQueue.Any((id) => id == friend.Id)) {
+                    Queue.IdQueue.Enqueue(friend.Id);
+                }
+            }
+
+            Console.WriteLine($"Deserialized {profile.Username} -> {profile.Elo} |{Queue.IdQueue.Count}|");
             
             await Task.Delay(50);
         }

@@ -23,7 +23,7 @@ public class ProfileDto
     public int DisplayMedals { get; set; }
 
     [JsonPropertyName("flags")]
-    public int Flags { get; set; }
+    public long Flags { get; set; }
 
     //[JsonPropertyName("permissions")]
     //public List<null>? Permissions { get; set; } // not sure how to map this
@@ -80,13 +80,13 @@ public class ProfileDto
     public int GatherDrops { get; set; }
 
     [JsonPropertyName("favorite_weapon_id")]
-    public int FavoriteWeaponId { get; set; }
+    public int? FavoriteWeaponId { get; set; }
 
     [JsonPropertyName("favorite_map_id")]
-    public int FavoriteMapId { get; set; }
+    public int? FavoriteMapId { get; set; }
 
     [JsonPropertyName("rank")]
-    public int Rank { get; set; }
+    public long? Rank { get; set; }
 
     [JsonPropertyName("assists")]
     public int Assists { get; set; }

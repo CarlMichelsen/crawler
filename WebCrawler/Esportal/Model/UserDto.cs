@@ -22,7 +22,7 @@ public class UserDto {
     public int DisplayMedals { get; set; }
 
     [JsonPropertyName("flags")]
-    public int Flags { get; set; }
+    public long Flags { get; set; }
 
     [JsonPropertyName("region_id")]
     public int RegionId { get; set; }
