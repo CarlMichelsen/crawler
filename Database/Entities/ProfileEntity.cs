@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Database.Entities;
 
 public class ProfileEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public ulong Id { get; set; }
     public string Username { get; set; } = string.Empty;
     public bool Banned { get; set; }

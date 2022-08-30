@@ -42,18 +42,18 @@ public class EsportalRequestHandler : BaseRequestHandler<UserEntity, ProfileEnti
 
         if (next is not null && result is not null)
         {
-            var newUnknowns = new List<UserEntity>();
+            /*var newUnknowns = new List<UserEntity>();
             foreach (var friend in result.Friends)
             {
+                if (friend is null) continue;
                 var existsAlready = await _context.Unknowns.AnyAsync((u) => u.Id == friend.Id);
                 if (!existsAlready) existsAlready = await _context.Profiles.AnyAsync((p) => p.Id == friend.Id);
-                if (existsAlready) continue;
-                
+                if (existsAlready || newUnknowns.Any(f => f.Id == friend.Id)) continue;
                 newUnknowns.Add(friend);
             }
 
             _context.Unknowns.AddRange(newUnknowns);
-            _context.Unknowns.Remove(next);
+            _context.Unknowns.Remove(next);*/
             _context.Profiles.Add(result);
             await _context.SaveChangesAsync();
             return true;

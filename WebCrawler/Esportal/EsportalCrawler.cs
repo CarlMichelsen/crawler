@@ -41,7 +41,9 @@ public class EsportalCrawler : ICrawler
         try
         {
             var next = BootstrapUserEntity();
+            System.Console.WriteLine(next.Username);
             var result = await Handler.HandleNext(next);
+            System.Console.WriteLine(result?.ToString());
             var profileWasAdded = await Handler.FinalizeNext(next, result);
             return profileWasAdded ? ICrawler.CrawlerResponse.Success : ICrawler.CrawlerResponse.Failure;
         }
@@ -50,6 +52,12 @@ public class EsportalCrawler : ICrawler
             Console.WriteLine($"Bootstrap failed\n{e.Message}");
             return ICrawler.CrawlerResponse.Failure;
         }
+    }
+
+    private void NoMoreItems()
+    {
+        var stop = Stop();
+        Console.WriteLine($"No more items left {stop}");
     }
 
     private UserEntity BootstrapUserEntity()
@@ -77,6 +85,7 @@ public class EsportalCrawler : ICrawler
             try
             {
                 var next = await handler.GetNext();
+                if (next is null) NoMoreItems();
                 var result = await handler.HandleNext(next);
                 await handler.FinalizeNext(next, result);
             }

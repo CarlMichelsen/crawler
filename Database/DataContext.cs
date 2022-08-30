@@ -14,6 +14,7 @@ public class DataContext : DbContext
     {
         var config = new DatabaseConfiguration();
         optionsBuilder.UseSqlServer(config.ConnectionString);
+        optionsBuilder.EnableSensitiveDataLogging();
     }
 
     public DbSet<ProfileEntity>? Profiles { get; set; }

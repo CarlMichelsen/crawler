@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Database.Entities;
 
 public class RecentStatsEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public ulong Id { get; set; }
     public int RecentKills { get; set; }
     public int RecentDeaths { get; set; }

@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Database.Entities;
 
 public class StatsEntity
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public ulong Id { get; set; }
     public int Elo { get; set; }
     public int Level { get; set; }
