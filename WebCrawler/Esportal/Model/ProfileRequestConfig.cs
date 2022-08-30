@@ -2,21 +2,21 @@ namespace WebCrawler.Esportal.Model;
 
 public class ProfileRequestConfig
 {
-    public bool Friends { get; set;} = false;
-    public bool UsernameHistory { get; set;} = false;
-    public bool Medals { get; set;} = false;
-    public bool Levels { get; set;} = false;
-    public bool CurrentMatch { get; set;} = false;
-    public bool Bans { get; set;} = false;
-    public bool Team { get; set;} = false;
-    public bool Twitch { get; set;} = false;
-    public bool Lemondogs { get; set;} = false;
-    public bool Rank { get; set;} = false;
-    public bool MatchDrop { get; set;} = false;
-    public long Underscore { get; }
-    public long Id { get; }
+    public bool Friends { get; set; } = false;
+    public bool UsernameHistory { get; set; } = false;
+    public bool Medals { get; set; } = false;
+    public bool Levels { get; set; } = false;
+    public bool CurrentMatch { get; set; } = false;
+    public bool Bans { get; set; } = false;
+    public bool Team { get; set; } = false;
+    public bool Twitch { get; set; } = false;
+    public bool Lemondogs { get; set; } = false;
+    public bool Rank { get; set; } = false;
+    public bool MatchDrop { get; set; } = false;
+    public ulong Underscore { get; }
+    public ulong Id { get; }
 
-    private ProfileRequestConfig(long id)
+    private ProfileRequestConfig(ulong id)
     {
         Underscore = 1661724976679;
         Id = id;
@@ -37,7 +37,7 @@ public class ProfileRequestConfig
         MatchDrop = true;
     }
 
-    public static ProfileRequestConfig AllTrue(long id) {
+    public static ProfileRequestConfig AllTrue(ulong id) {
         var conf = new ProfileRequestConfig(id);
         conf.SetAllTrue();
         return conf;

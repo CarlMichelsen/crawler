@@ -5,7 +5,7 @@ namespace WebCrawler.Esportal.Model;
 public class CurrentMatchDto
 {
     [JsonPropertyName("id")]
-    public long? Id { get; set; }
+    public ulong? Id { get; set; }
 
     [JsonPropertyName("team")]
     public int Team { get; set; }

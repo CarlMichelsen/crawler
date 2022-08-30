@@ -4,12 +4,12 @@ namespace WebCrawler.Esportal;
 
 public class EsportalRequestQueue : BaseRequestQueue
 {
-    public Queue<long> IdQueue;
-    private long _currentId = -1;
+    public Queue<ulong> IdQueue;
+    private ulong? _currentId = null;
 
     public EsportalRequestQueue()
     {
-        IdQueue = new Queue<long>();
+        IdQueue = new Queue<ulong>();
         IdQueue.Enqueue(113878688);
     }
 
@@ -24,7 +24,8 @@ public class EsportalRequestQueue : BaseRequestQueue
     {
         await Task.Delay(10);
         _currentId = IdQueue.Dequeue();
-        return EsportalUri(ProfileRequestConfig.AllTrue(_currentId));
+        if (_currentId is null) return null;
+        return EsportalUri(ProfileRequestConfig.AllTrue((ulong)_currentId));
     }
 
     public override void FinalizeNext(bool success)
@@ -32,11 +33,11 @@ public class EsportalRequestQueue : BaseRequestQueue
         if (success)
         {
             Console.WriteLine("Success!");
-            _currentId = -1;
+            _currentId = null;
         }
         else
         {
-            if (_currentId != (long)-1) IdQueue.Enqueue(_currentId);
+            if (_currentId is not null) IdQueue.Enqueue((ulong)_currentId);
             Console.WriteLine("Failure!");
         }
     }

@@ -5,7 +5,7 @@ namespace WebCrawler.Esportal.Model;
 public class ProfileDto
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
+    public ulong Id { get; set; }
 
     [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
@@ -23,7 +23,7 @@ public class ProfileDto
     public int DisplayMedals { get; set; }
 
     [JsonPropertyName("flags")]
-    public long Flags { get; set; }
+    public ulong Flags { get; set; }
 
     //[JsonPropertyName("permissions")]
     //public List<null>? Permissions { get; set; } // not sure how to map this
@@ -86,7 +86,7 @@ public class ProfileDto
     public int? FavoriteMapId { get; set; }
 
     [JsonPropertyName("rank")]
-    public long? Rank { get; set; }
+    public ulong? Rank { get; set; }
 
     [JsonPropertyName("assists")]
     public int Assists { get; set; }
@@ -230,10 +230,10 @@ public class ProfileDto
     public CurrentMatchDto? CurrentMatch { get; set; }
 
     [JsonPropertyName("current_gather_id")]
-    public long? CurrentGatherId { get; set; }
+    public ulong? CurrentGatherId { get; set; }
 
     [JsonPropertyName("current_tournament_lobby")]
-    public long? CurrentTournamentLobby { get; set; }
+    public ulong? CurrentTournamentLobby { get; set; }
 
     //[JsonPropertyName("team")]
     //public null Team { get; set; }
@@ -242,7 +242,7 @@ public class ProfileDto
     //public null NelRegionId { get; set; }
 
     [JsonPropertyName("lemondogs_user_id")]
-    public long? LemondogsUserId { get; set; }
+    public ulong? LemondogsUserId { get; set; }
 
     [JsonPropertyName("match_drops")]
     public List<MatchDropDto> MatchDrops { get; set; } = new List<MatchDropDto>();

@@ -5,7 +5,7 @@ namespace WebCrawler.Esportal.Model;
 public class FriendDto
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
+    public ulong Id { get; set; }
 
     [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ public class FriendDto
     public int DisplayMedals { get; set; }
 
     [JsonPropertyName("flags")]
-    public long Flags { get; set; }
+    public ulong Flags { get; set; }
 
     [JsonPropertyName("region_id")]
     public int RegionId { get; set; }
@@ -28,13 +28,7 @@ public class FriendDto
     [JsonPropertyName("subregion_id")]
     public int SubregionId { get; set; }
 
-    //[JsonPropertyName("permissions")]
-    //public null Permissions { get; set; }
-
     [JsonPropertyName("online_status")]
     public int OnlineStatus { get; set; }
-
-    [JsonPropertyName("inserted")]
-    public long Inserted { get; set; }
 }
 

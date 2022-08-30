@@ -7,7 +7,7 @@ namespace WebCrawler.Esportal.Model;
 public class MatchDropDto
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
+    public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
@@ -25,7 +25,7 @@ public class MatchDropDto
     public UserDto? User { get; set; }
 
     [JsonPropertyName("match_id")]
-    public long MatchId { get; set; }
+    public ulong MatchId { get; set; }
 
     [JsonPropertyName("inserted")]
     public int Inserted { get; set; }

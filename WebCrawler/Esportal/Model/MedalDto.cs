@@ -5,22 +5,22 @@ namespace WebCrawler.Esportal.Model;
 public class MedalDto
 {
     [JsonPropertyName("id")]
-    public long Id { get; set; }
+    public ulong Id { get; set; }
 
     [JsonPropertyName("objective")]
-    public long? Objective { get; set; }
+    public ulong? Objective { get; set; }
 
     [JsonPropertyName("amount")]
     public int? Amount { get; set; }
     
     [JsonPropertyName("user_id")]
-    public long? UserId { get; set; }
+    public ulong? UserId { get; set; }
 
     [JsonPropertyName("match_id")]
-    public long? MatchId { get; set; }
+    public ulong? MatchId { get; set; }
 
     [JsonPropertyName("inserted")]
-    public long? Inserted { get; set; }
+    public ulong? Inserted { get; set; }
 
     [JsonPropertyName("locked")]
     public bool Locked { get; set; }
