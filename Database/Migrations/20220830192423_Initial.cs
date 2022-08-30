@@ -113,7 +113,7 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserEntity",
+                name: "Unknowns",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
@@ -130,9 +130,9 @@ namespace Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserEntity", x => x.Id);
+                    table.PrimaryKey("PK_Unknowns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserEntity_Profiles_ProfileEntityId",
+                        name: "FK_Unknowns_Profiles_ProfileEntityId",
                         column: x => x.ProfileEntityId,
                         principalTable: "Profiles",
                         principalColumn: "Id");
@@ -180,9 +180,9 @@ namespace Database.Migrations
                         principalTable: "Profiles",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_MatchEntity_UserEntity_UserId",
+                        name: "FK_MatchEntity_Unknowns_UserId",
                         column: x => x.UserId,
-                        principalTable: "UserEntity",
+                        principalTable: "Unknowns",
                         principalColumn: "Id");
                 });
 
@@ -207,8 +207,8 @@ namespace Database.Migrations
                 column: "StatsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserEntity_ProfileEntityId",
-                table: "UserEntity",
+                name: "IX_Unknowns_ProfileEntityId",
+                table: "Unknowns",
                 column: "ProfileEntityId");
 
             migrationBuilder.CreateIndex(
@@ -226,7 +226,7 @@ namespace Database.Migrations
                 name: "UsernameEntity");
 
             migrationBuilder.DropTable(
-                name: "UserEntity");
+                name: "Unknowns");
 
             migrationBuilder.DropTable(
                 name: "Profiles");

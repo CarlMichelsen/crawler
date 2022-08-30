@@ -317,7 +317,7 @@ namespace Database.Migrations
 
                     b.HasIndex("ProfileEntityId");
 
-                    b.ToTable("UserEntity");
+                    b.ToTable("Unknowns");
                 });
 
             modelBuilder.Entity("Database.Entities.UsernameEntity", b =>

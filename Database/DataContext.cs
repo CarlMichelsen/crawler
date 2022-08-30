@@ -12,8 +12,10 @@ public class DataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=master;Trusted_Connection=True;");
+        var config = new DatabaseConfiguration();
+        optionsBuilder.UseSqlServer(config.ConnectionString);
     }
 
     public DbSet<ProfileEntity>? Profiles { get; set; }
+    public DbSet<UserEntity>? Unknowns { get; set; }
 }

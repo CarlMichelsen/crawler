@@ -13,7 +13,7 @@ public class CrawlerHandler {
         private set => _instance = value;
     }
 
-    private EsportalCrawler _crawler;
+    private ICrawler _crawler;
 
     private CrawlerHandler()
     {
@@ -28,5 +28,10 @@ public class CrawlerHandler {
     public string Stop()
     {
         return Enum.GetName(typeof(ICrawler.CrawlerResponse), _crawler.Stop()) ?? string.Empty;
+    }
+
+    public async Task<string> Bootstrap()
+    {
+        return Enum.GetName(typeof(ICrawler.CrawlerResponse), await _crawler.Bootstrap()) ?? string.Empty;
     }
 }

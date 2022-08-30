@@ -8,9 +8,11 @@ public interface ICrawler
         Stopped,
         CurrentlyStarted,
         CurrentlyStopped,
+        Success,
         Failure
     }
 
     public CrawlerResponse Start();
     public CrawlerResponse Stop();
+    public Task<CrawlerResponse> Bootstrap();
 }
