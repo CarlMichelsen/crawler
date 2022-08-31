@@ -48,6 +48,7 @@ public class EsportalCrawler : ICrawler
         catch (System.Exception e)
         {
             Console.WriteLine($"Bootstrap failed\n{e.Message}");
+            Console.WriteLine(e.InnerException);
             return ICrawler.CrawlerResponse.Failure;
         }
     }
@@ -58,19 +59,23 @@ public class EsportalCrawler : ICrawler
         Console.WriteLine($"No more items left {stop}");
     }
 
-    private UserEntity BootstrapUserEntity()
+    private UnknownEntity BootstrapUserEntity()
     {
         // mock bootstrap data taken 30. aug. 2022
-        var ent = new UserEntity();
-        ent.Id = 957283692;
-        ent.Username = "mag";
-        ent.AvatarHash = "ecfef2bf5b1146c96566d92b6d8b663cb0f4d2c3";
-        ent.CountryId = 57;
-        ent.DisplayMedals = 115587185;
-        ent.Level = null;
-        ent.Flags = 271679521;
-        ent.RegionId = 0;
-        ent.SubregionId = 0;
+        var usr = new UserEntity();
+        usr.Id = 957283692;
+        usr.Username = "mag";
+        usr.AvatarHash = "ecfef2bf5b1146c96566d92b6d8b663cb0f4d2c3";
+        usr.CountryId = 57;
+        usr.DisplayMedals = 115587185;
+        usr.Level = null;
+        usr.Flags = 271679521;
+        usr.RegionId = 0;
+        usr.SubregionId = 0;
+
+        var ent = new UnknownEntity();
+        ent.User = usr;
+        ent.Recorded = DateTime.Now;
         return ent;
     }
 
@@ -87,8 +92,10 @@ public class EsportalCrawler : ICrawler
                 var result = await handler.HandleNext(next);
                 await handler.FinalizeNext(next, result);
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
+                Console.WriteLine(e.Message);
+                if (!string.IsNullOrWhiteSpace(e.InnerException?.Message)) Console.WriteLine(e.InnerException?.Message);
                 await handler.FinalizeNext(null, null);
             }
         };

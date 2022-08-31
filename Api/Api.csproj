@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebCrawler\WebCrawler.csproj" />
-    <ProjectReference Include="..\Database\Database.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

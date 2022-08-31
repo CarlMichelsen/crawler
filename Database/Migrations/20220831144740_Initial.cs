@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -82,30 +83,30 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Profiles",
+                name: "ProfileEntity",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Banned = table.Column<bool>(type: "bit", nullable: false),
                     AvatarHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CountryId = table.Column<int>(type: "int", nullable: false),
                     Flags = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     StatsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    RecentStatsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    RecentStatsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                    table.PrimaryKey("PK_ProfileEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Profiles_RecentStatsEntity_RecentStatsId",
+                        name: "FK_ProfileEntity_RecentStatsEntity_RecentStatsId",
                         column: x => x.RecentStatsId,
                         principalTable: "RecentStatsEntity",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Profiles_StatsEntity_StatsId",
+                        name: "FK_ProfileEntity_StatsEntity_StatsId",
                         column: x => x.StatsId,
                         principalTable: "StatsEntity",
                         principalColumn: "Id",
@@ -113,11 +114,10 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Unknowns",
+                name: "UserEntity",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AvatarHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CountryId = table.Column<int>(type: "int", nullable: false),
@@ -130,11 +130,11 @@ namespace Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Unknowns", x => x.Id);
+                    table.PrimaryKey("PK_UserEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Unknowns_Profiles_ProfileEntityId",
+                        name: "FK_UserEntity_ProfileEntity_ProfileEntityId",
                         column: x => x.ProfileEntityId,
-                        principalTable: "Profiles",
+                        principalTable: "ProfileEntity",
                         principalColumn: "Id");
                 });
 
@@ -142,8 +142,7 @@ namespace Database.Migrations
                 name: "UsernameEntity",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfileEntityId = table.Column<decimal>(type: "decimal(20,0)", nullable: true)
                 },
@@ -151,64 +150,50 @@ namespace Database.Migrations
                 {
                     table.PrimaryKey("PK_UsernameEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UsernameEntity_Profiles_ProfileEntityId",
+                        name: "FK_UsernameEntity_ProfileEntity_ProfileEntityId",
                         column: x => x.ProfileEntityId,
-                        principalTable: "Profiles",
+                        principalTable: "ProfileEntity",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "MatchEntity",
+                name: "UnknownEntity",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
-                    MatchId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    ProfileEntityId = table.Column<decimal>(type: "decimal(20,0)", nullable: true)
+                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MatchEntity", x => x.Id);
+                    table.PrimaryKey("PK_UnknownEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MatchEntity_Profiles_ProfileEntityId",
-                        column: x => x.ProfileEntityId,
-                        principalTable: "Profiles",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_MatchEntity_Unknowns_UserId",
+                        name: "FK_UnknownEntity_UserEntity_UserId",
                         column: x => x.UserId,
-                        principalTable: "Unknowns",
-                        principalColumn: "Id");
+                        principalTable: "UserEntity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchEntity_ProfileEntityId",
-                table: "MatchEntity",
-                column: "ProfileEntityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MatchEntity_UserId",
-                table: "MatchEntity",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Profiles_RecentStatsId",
-                table: "Profiles",
+                name: "IX_ProfileEntity_RecentStatsId",
+                table: "ProfileEntity",
                 column: "RecentStatsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Profiles_StatsId",
-                table: "Profiles",
+                name: "IX_ProfileEntity_StatsId",
+                table: "ProfileEntity",
                 column: "StatsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unknowns_ProfileEntityId",
-                table: "Unknowns",
+                name: "IX_UnknownEntity_UserId",
+                table: "UnknownEntity",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserEntity_ProfileEntityId",
+                table: "UserEntity",
                 column: "ProfileEntityId");
 
             migrationBuilder.CreateIndex(
@@ -220,16 +205,16 @@ namespace Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MatchEntity");
+                name: "UnknownEntity");
 
             migrationBuilder.DropTable(
                 name: "UsernameEntity");
 
             migrationBuilder.DropTable(
-                name: "Unknowns");
+                name: "UserEntity");
 
             migrationBuilder.DropTable(
-                name: "Profiles");
+                name: "ProfileEntity");
 
             migrationBuilder.DropTable(
                 name: "RecentStatsEntity");

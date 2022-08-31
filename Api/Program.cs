@@ -3,6 +3,8 @@ using Api;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+CrawlerSingleton.Instance.Start();
+
 app.MapGet("/", () => "Weeee!");
 
 app.MapGet("/start", () => CrawlerSingleton.Instance.Start());

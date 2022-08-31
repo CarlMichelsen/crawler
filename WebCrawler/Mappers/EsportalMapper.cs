@@ -21,15 +21,14 @@ public static class EsportalMapper
         return new MapperConfiguration(cfg => 
         {
             cfg.CreateMap<ProfileDto, ProfileEntity>();
-            cfg.CreateMap<ProfileDto, StatsEntity>();
-            cfg.CreateMap<ProfileDto, RecentStatsEntity>();
-
+            cfg.CreateMap<ProfileDto, StatsEntity>()
+                .ForMember(s => s.Id, opt => opt.Ignore());
+            cfg.CreateMap<ProfileDto, RecentStatsEntity>()
+                .ForMember(s => s.Id, opt => opt.Ignore());
             cfg.CreateMap<MatchDropDto, MatchEntity>();
             cfg.CreateMap<CurrentMatchDto, MatchEntity>();
-
             cfg.CreateMap<UserDto, UserEntity>();
             cfg.CreateMap<FriendDto, UserEntity>();
-
             cfg.CreateMap<OldUsername, UsernameEntity>();
         });
     }

@@ -12,5 +12,5 @@ public class MatchEntity
     public string Image { get; set; } = string.Empty;
     public UserEntity? User { get; set; }
     public ulong MatchId { get; set; }
-    public DateTime Inserted { get; } = DateTime.Now;
+    public DateTime? Recorded { get; set; }
 }

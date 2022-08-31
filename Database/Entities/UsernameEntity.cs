@@ -4,7 +4,7 @@ namespace Database.Entities;
 
 public class UsernameEntity
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public ulong Id { get; set; }
     public string Username { get; set; } = string.Empty;
 }

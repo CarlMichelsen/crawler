@@ -22,54 +22,10 @@ namespace Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Database.Entities.MatchEntity", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
-
-                    b.Property<int>("Category")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("MatchId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("ProfileEntityId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<decimal?>("UserId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfileEntityId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MatchEntity");
-                });
-
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
                 {
                     b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
 
                     b.Property<string>("AvatarHash")
                         .IsRequired()
@@ -87,6 +43,9 @@ namespace Database.Migrations
                     b.Property<decimal>("RecentStatsId")
                         .HasColumnType("decimal(20,0)");
 
+                    b.Property<DateTime>("Recorded")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("StatsId")
                         .HasColumnType("decimal(20,0)");
 
@@ -100,7 +59,7 @@ namespace Database.Migrations
 
                     b.HasIndex("StatsId");
 
-                    b.ToTable("Profiles");
+                    b.ToTable("ProfileEntity");
                 });
 
             modelBuilder.Entity("Database.Entities.RecentStatsEntity", b =>
@@ -276,13 +235,31 @@ namespace Database.Migrations
                     b.ToTable("StatsEntity");
                 });
 
-            modelBuilder.Entity("Database.Entities.UserEntity", b =>
+            modelBuilder.Entity("Database.Entities.UnknownEntity", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Recorded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("UserId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UnknownEntity");
+                });
+
+            modelBuilder.Entity("Database.Entities.UserEntity", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .HasColumnType("decimal(20,0)");
 
                     b.Property<string>("AvatarHash")
                         .IsRequired()
@@ -317,16 +294,13 @@ namespace Database.Migrations
 
                     b.HasIndex("ProfileEntityId");
 
-                    b.ToTable("Unknowns");
+                    b.ToTable("UserEntity");
                 });
 
             modelBuilder.Entity("Database.Entities.UsernameEntity", b =>
                 {
                     b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
 
                     b.Property<decimal?>("ProfileEntityId")
                         .HasColumnType("decimal(20,0)");
@@ -340,19 +314,6 @@ namespace Database.Migrations
                     b.HasIndex("ProfileEntityId");
 
                     b.ToTable("UsernameEntity");
-                });
-
-            modelBuilder.Entity("Database.Entities.MatchEntity", b =>
-                {
-                    b.HasOne("Database.Entities.ProfileEntity", null)
-                        .WithMany("MatchDrops")
-                        .HasForeignKey("ProfileEntityId");
-
-                    b.HasOne("Database.Entities.UserEntity", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
@@ -374,6 +335,17 @@ namespace Database.Migrations
                     b.Navigation("Stats");
                 });
 
+            modelBuilder.Entity("Database.Entities.UnknownEntity", b =>
+                {
+                    b.HasOne("Database.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Database.Entities.UserEntity", b =>
                 {
                     b.HasOne("Database.Entities.ProfileEntity", null)
@@ -391,8 +363,6 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
                 {
                     b.Navigation("Friends");
-
-                    b.Navigation("MatchDrops");
 
                     b.Navigation("OldUsernames");
                 });
