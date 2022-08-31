@@ -41,9 +41,7 @@ public class EsportalCrawler : ICrawler
         try
         {
             var next = BootstrapUserEntity();
-            System.Console.WriteLine(next.Username);
             var result = await Handler.HandleNext(next);
-            System.Console.WriteLine(result?.ToString());
             var profileWasAdded = await Handler.FinalizeNext(next, result);
             return profileWasAdded ? ICrawler.CrawlerResponse.Success : ICrawler.CrawlerResponse.Failure;
         }

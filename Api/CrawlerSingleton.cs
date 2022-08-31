@@ -1,13 +1,13 @@
 using WebCrawler.Esportal;
 using WebCrawler;
 
-namespace Api.Handlers;
+namespace Api;
 
-public class CrawlerHandler {
-    private static CrawlerHandler? _instance;
-    public static CrawlerHandler Instance {
+public class CrawlerSingleton {
+    private static CrawlerSingleton? _instance;
+    public static CrawlerSingleton Instance {
         get {
-            if (_instance is null) _instance = new CrawlerHandler();
+            if (_instance is null) _instance = new CrawlerSingleton();
             return _instance;
         }
         private set => _instance = value;
@@ -15,7 +15,7 @@ public class CrawlerHandler {
 
     private ICrawler _crawler;
 
-    private CrawlerHandler()
+    private CrawlerSingleton()
     {
         _crawler = new EsportalCrawler();
     }

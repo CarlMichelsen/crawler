@@ -1,15 +1,15 @@
-using Api.Handlers;
+using Api;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 app.MapGet("/", () => "Weeee!");
 
-app.MapGet("/start", () => CrawlerHandler.Instance.Start());
+app.MapGet("/start", () => CrawlerSingleton.Instance.Start());
 
-app.MapGet("/stop", () => CrawlerHandler.Instance.Stop());
+app.MapGet("/stop", () => CrawlerSingleton.Instance.Stop());
 
-app.MapGet("/bootstrap", async () => await CrawlerHandler.Instance.Bootstrap());
+app.MapGet("/bootstrap", async () => await CrawlerSingleton.Instance.Bootstrap());
 
 Console.WriteLine("Started");
 app.Run();
