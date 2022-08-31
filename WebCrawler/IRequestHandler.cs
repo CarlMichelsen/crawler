@@ -6,7 +6,7 @@ public interface IRequestHandler<T, R>
 
     public abstract Task<T?> GetNext();
 
-    public abstract Task<bool> FinalizeNext(T? next, R? result); // if any one if these are null the operation should be considered a failure
+    public abstract Task<bool> FinalizeNext(T? next, R? result, string? errorMessage); // if any one if these are null the operation should be considered a failure
 
     public abstract Task<R?> HandleRequestResponse(HttpResponseMessage response, T current);
 

@@ -69,7 +69,7 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         return result;
     }
 
-    public async Task<bool> FinalizeNext(UnknownEntity? next, ProfileEntity? result)
+    public async Task<bool> FinalizeNext(UnknownEntity? next, ProfileEntity? result, string? errorMessage)
     {
         if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
         if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
@@ -88,8 +88,12 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
             }
             await CompleteTransaction(result, newUnknowns);
             return true;
-        } //TODO: add else statement for cleanup in case of catastrophic failure.
-        await FailureTransaction();
+        }
+        else
+        {
+            await FailureTransaction(next, errorMessage);
+        }
+        
         return false;
     }
 
@@ -102,7 +106,7 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         };
     }
 
-    private async Task CompleteTransaction(ProfileEntity profile, List<UserEntity> newUnknowns)
+    private async Task CompleteTransaction(ProfileEntity profile, List<UserEntity> newUnknowns) //TODO: this should be an actual transaction...
     {
         if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
         if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
@@ -125,10 +129,33 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         Console.WriteLine($"Added {profile.Username}\t{profile.Recorded.ToShortTimeString()}");
     }
 
-    private async Task FailureTransaction()
+    private async Task FailureTransaction(UnknownEntity? next, string? message) //TODO: this should be an actual transaction...
     {
-        await Task.Delay(10);
-        Console.WriteLine("FailureTransaction");
+        if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
+        if (_context.FailedUnknownEntity is null) throw new InvalidOperationException("Invalid FailedUnknownEntity DataContext.");
+
+        if (next is not null) {
+            if (!await _context.FailedUnknownEntity.AnyAsync(f => f.UserId == next.User.Id))
+            {
+                var failed = new FailedUnknownEntity()
+                {
+                    UserId = next.User.Id,
+                    ErrorMessage = message,
+                    Recorded = DateTime.Now
+                };
+                await _context.FailedUnknownEntity.AddAsync(failed);
+            }
+
+            _context.UnknownEntity.Remove(next);
+            var rows = await _context.SaveChangesAsync();
+            System.Console.WriteLine(rows);
+
+            Console.WriteLine($"Failed {next.User.Username}");
+        }
+        else
+        {
+            Console.WriteLine("Failed unspecified UnknownEntity");
+        }
     }
 
     private bool TrySerializeAndMapProfileDto(string input, out ProfileEntity? profile)

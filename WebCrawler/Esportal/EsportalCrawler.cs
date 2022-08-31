@@ -1,4 +1,4 @@
-using Database.Entities; //only needed for bootstrap
+using Database.Entities;
 
 namespace WebCrawler.Esportal;
 
@@ -6,6 +6,8 @@ public class EsportalCrawler : ICrawler
 {
     public EsportalRequestHandler Handler;
     private Timer? _timer = null;
+
+    private UnknownEntity? _currentUnknownEntity = null; // keep this in backpocket in case something catastropic happens
 
     public EsportalCrawler()
     {
@@ -42,7 +44,7 @@ public class EsportalCrawler : ICrawler
         {
             var next = BootstrapUserEntity();
             var result = await Handler.HandleNext(next);
-            var profileWasAdded = await Handler.FinalizeNext(next, result);
+            var profileWasAdded = await Handler.FinalizeNext(next, result, null);
             return profileWasAdded ? ICrawler.CrawlerResponse.Success : ICrawler.CrawlerResponse.Failure;
         }
         catch (System.Exception e)
@@ -87,16 +89,17 @@ public class EsportalCrawler : ICrawler
 
             try
             {
-                var next = await handler.GetNext();
+                _currentUnknownEntity = await handler.GetNext();
+                var next = _currentUnknownEntity;
                 if (next is null) NoMoreItems();
                 var result = await handler.HandleNext(next);
-                await handler.FinalizeNext(next, result);
+                await handler.FinalizeNext(next, result, null);
             }
             catch (System.Exception e)
             {
                 Console.WriteLine(e.Message);
                 if (!string.IsNullOrWhiteSpace(e.InnerException?.Message)) Console.WriteLine(e.InnerException?.Message);
-                await handler.FinalizeNext(null, null);
+                await handler.FinalizeNext(_currentUnknownEntity, null, e.Message);
             }
         };
         return callback;

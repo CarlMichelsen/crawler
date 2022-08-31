@@ -10,6 +10,21 @@ namespace Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "FailedUnknownEntity",
+                columns: table => new
+                {
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FailedUnknownEntity", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RecentStatsEntity",
                 columns: table => new
                 {
@@ -204,6 +219,9 @@ namespace Database.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "FailedUnknownEntity");
+
             migrationBuilder.DropTable(
                 name: "UnknownEntity");
 
