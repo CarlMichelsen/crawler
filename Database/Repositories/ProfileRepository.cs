@@ -59,6 +59,9 @@ public class ProfileRepository
                 var unknownEntities = await FindNewUnknownUsers(profile.Friends, context);
                 context.UnknownEntity.AddRange(unknownEntities);
 
+                // Add recorded date
+                profile.Recorded = DateTime.Now;
+
                 // save and exit
                 context.SaveChanges();
                 await dbContextTransaction.CommitAsync();

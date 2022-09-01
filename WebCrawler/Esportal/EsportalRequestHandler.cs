@@ -71,10 +71,13 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         return result;
     }
 
-    private string StringFromUnknown(UnknownEntity unk)
+    private string StringFromUnknown(ProfileEntity profile)
     {
-        StringBuilder sb = new(unk.User.Username);
-        //sb.Append(new string(' ', Math.Clamp(25-unk.User.Username.Length, 5, 25)));
+        StringBuilder sb = new(profile.Username);
+        sb.Append(new string(' ', Math.Clamp(16-profile.Username.Length, 2, 16)));
+        sb.Append(profile.Stats.Elo);
+        sb.Append(new string(' ', Math.Clamp(8-profile.Stats.Elo.ToString().Length, 2, 8)));
+        sb.Append(profile.Recorded.ToString());
         return sb.ToString();
     }
 
@@ -86,7 +89,7 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
             if (success)
             {
                 await UnknownRepository.RemoveUnknown(next.Id);
-                Console.WriteLine(StringFromUnknown(next));
+                Console.WriteLine(StringFromUnknown(result));
             }
             return success;
         }
