@@ -4,6 +4,8 @@ using WebCrawler.Esportal.Model;
 using WebCrawler.Mappers;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Database.Repositories;
+using System.Text;
 
 namespace WebCrawler.Esportal;
 
@@ -69,32 +71,41 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         return result;
     }
 
+    private string StringFromUnknown(UnknownEntity unk)
+    {
+        StringBuilder sb = new(unk.User.Username);
+        //sb.Append(new string(' ', Math.Clamp(25-unk.User.Username.Length, 5, 25)));
+        return sb.ToString();
+    }
+
     public async Task<bool> FinalizeNext(UnknownEntity? next, ProfileEntity? result, string? errorMessage)
     {
-        if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
-        if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
-
         if (next is not null && result is not null)
         {
-            var newUnknowns = new List<UserEntity>();
-            foreach (var friend in result.Friends)
+            var success = await ProfileRepository.AddProfile(result);
+            if (success)
             {
-                if (friend is null) continue;
-                if (friend.Id == next.Id) continue;
-                var existsAlready = await _context.UnknownEntity.Include(unk => unk.User).AnyAsync((u) => u.User.Id == friend.Id);
-                if (!existsAlready) existsAlready = await _context.ProfileEntity.AnyAsync((p) => p.Id == friend.Id);
-                if (existsAlready || newUnknowns.Any(f => f.Id == friend.Id)) continue;
-                newUnknowns.Add(friend);
+                await UnknownRepository.RemoveUnknown(next.Id);
+                Console.WriteLine(StringFromUnknown(next));
             }
-            await CompleteTransaction(result, newUnknowns);
-            return true;
+            return success;
         }
         else
         {
-            await FailureTransaction(next, errorMessage);
+            if (next is null) return false;
+            var success = await UnknownRepository.RemoveUnknown(next.Id);
+            if (success)
+            {
+                var failed = new FailedUnknownEntity()
+                {
+                    UserId = next.User.Id,
+                    ErrorMessage = errorMessage,
+                    Recorded = DateTime.Now
+                };
+                await FailedUnknownRepository.AddFailedUnknown(failed);
+            }
+            return false;
         }
-        
-        return false;
     }
 
     private UnknownEntity UserEntityToUnknownEntity(UserEntity input)
@@ -104,58 +115,6 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
             User = input,
             Recorded = DateTime.Now
         };
-    }
-
-    private async Task CompleteTransaction(ProfileEntity profile, List<UserEntity> newUnknowns) //TODO: this should be an actual transaction...
-    {
-        if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
-        if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
-        if (_context.UserEntity is null) throw new InvalidOperationException("Invalid UserEntity DataContext.");
-
-        profile.Recorded = DateTime.Now;
-        var friends = new List<UserEntity>();
-        foreach (var friend in profile.Friends)
-        {
-            var exists = friends.Any(f => f.Id == friend.Id) || await _context.UserEntity.AnyAsync(u => u.Id == friend.Id);
-            if (exists) continue;
-            friends.Add(friend);
-        }
-        profile.Friends = friends;
-        _context.ProfileEntity.Add(profile);
-        _context.UnknownEntity.RemoveRange(_context.UnknownEntity.Where(unk => unk.User.Id == profile.Id));
-        _context.UnknownEntity.AddRange(newUnknowns.Select(usr => UserEntityToUnknownEntity(usr)));
-        await _context.SaveChangesAsync();
-
-        Console.WriteLine($"Added {profile.Username}\t{profile.Recorded.ToShortTimeString()}");
-    }
-
-    private async Task FailureTransaction(UnknownEntity? next, string? message) //TODO: this should be an actual transaction...
-    {
-        if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
-        if (_context.FailedUnknownEntity is null) throw new InvalidOperationException("Invalid FailedUnknownEntity DataContext.");
-
-        if (next is not null) {
-            if (!await _context.FailedUnknownEntity.AnyAsync(f => f.UserId == next.User.Id))
-            {
-                var failed = new FailedUnknownEntity()
-                {
-                    UserId = next.User.Id,
-                    ErrorMessage = message,
-                    Recorded = DateTime.Now
-                };
-                await _context.FailedUnknownEntity.AddAsync(failed);
-            }
-
-            _context.UnknownEntity.Remove(next);
-            var rows = await _context.SaveChangesAsync();
-            System.Console.WriteLine(rows);
-
-            Console.WriteLine($"Failed {next.User.Username}");
-        }
-        else
-        {
-            Console.WriteLine("Failed unspecified UnknownEntity");
-        }
     }
 
     private bool TrySerializeAndMapProfileDto(string input, out ProfileEntity? profile)

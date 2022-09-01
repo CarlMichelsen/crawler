@@ -97,7 +97,6 @@ public class EsportalCrawler : ICrawler
             }
             catch (System.Exception e)
             {
-                Console.WriteLine(e.Message);
                 if (!string.IsNullOrWhiteSpace(e.InnerException?.Message)) Console.WriteLine(e.InnerException?.Message);
                 await handler.FinalizeNext(_currentUnknownEntity, null, e.Message);
             }

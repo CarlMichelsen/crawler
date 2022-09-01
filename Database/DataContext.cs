@@ -15,7 +15,7 @@ public class DataContext : DbContext
     {
         var config = new DatabaseConfiguration();
         optionsBuilder.UseSqlServer(config.ConnectionString, (SqlServerDbContextOptionsBuilder builder) => {
-            builder.EnableRetryOnFailure();
+            //builder.EnableRetryOnFailure();
         });
         optionsBuilder.EnableSensitiveDataLogging();
     }
