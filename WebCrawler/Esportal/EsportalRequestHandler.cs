@@ -77,6 +77,8 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
         sb.Append(new string(' ', Math.Clamp(16-profile.Username.Length, 2, 16)));
         sb.Append(profile.Stats.Elo);
         sb.Append(new string(' ', Math.Clamp(8-profile.Stats.Elo.ToString().Length, 2, 8)));
+        sb.Append($">{profile.Id}<");
+        sb.Append(new string(' ', Math.Clamp(8-profile.Stats.Elo.ToString().Length, 2, 8)));
         sb.Append(profile.Recorded.ToString());
         return sb.ToString();
     }
@@ -91,33 +93,34 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
                 await UnknownRepository.RemoveUnknown(next.Id);
                 Console.WriteLine(StringFromUnknown(result));
             }
+            else
+            {
+                await HandleFailure(next, errorMessage);
+            }
             return success;
         }
         else
         {
-            if (next is null) return false;
-            var success = await UnknownRepository.RemoveUnknown(next.Id);
-            if (success)
-            {
-                var failed = new FailedUnknownEntity()
-                {
-                    UserId = next.User.Id,
-                    ErrorMessage = errorMessage,
-                    Recorded = DateTime.Now
-                };
-                await FailedUnknownRepository.AddFailedUnknown(failed);
-            }
+            await HandleFailure(next, errorMessage);
             return false;
         }
     }
 
-    private UnknownEntity UserEntityToUnknownEntity(UserEntity input)
+    private async Task HandleFailure(UnknownEntity? next, string? errorMessage)
     {
-        return new UnknownEntity()
+        if (next is null) return;
+        var success = await UnknownRepository.RemoveUnknown(next.Id);
+        if (success)
         {
-            User = input,
-            Recorded = DateTime.Now
-        };
+            var failed = new FailedUnknownEntity()
+            {
+                UserId = next.User.Id,
+                ErrorMessage = errorMessage,
+                Recorded = DateTime.Now
+            };
+            await FailedUnknownRepository.AddFailedUnknown(failed);
+        }
+        return;
     }
 
     private bool TrySerializeAndMapProfileDto(string input, out ProfileEntity? profile)
