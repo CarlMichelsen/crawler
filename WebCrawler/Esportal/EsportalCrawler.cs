@@ -17,7 +17,7 @@ public class EsportalCrawler : ICrawler
     public ICrawler.CrawlerResponse Start()
     {
         if (_timer is not null) return ICrawler.CrawlerResponse.CurrentlyStarted;
-        _timer = new(TimerCallbackFactory(), Handler, TimeSpan.Zero, TimeSpan.FromMilliseconds(2200));
+        _timer = new(TimerCallbackFactory(), Handler, TimeSpan.Zero, TimeSpan.FromMilliseconds(2500));
         return ICrawler.CrawlerResponse.Started;
     }
 
