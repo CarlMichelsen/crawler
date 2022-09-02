@@ -1,15 +1,39 @@
 using Api;
+using Database;
+using WebCrawler;
+using WebCrawler.Esportal;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Dependency Injection
+builder.Services
+    .AddTransient<DataContext>()
+    .AddSingleton<ICrawler, EsportalCrawler>();
+
 var app = builder.Build();
 
-app.MapGet("/", () => "Weeee!");
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        //options.RoutePrefix = string.Empty;
+    });
+}
 
-app.MapGet("/start", () => CrawlerSingleton.Instance.Start());
+app.UseHttpsRedirection();
 
-app.MapGet("/stop", () => CrawlerSingleton.Instance.Stop());
+app.UseAuthorization();
 
-app.MapGet("/bootstrap", async () => await CrawlerSingleton.Instance.Bootstrap());
+app.MapControllers();
 
-Console.WriteLine("Started");
 app.Run();

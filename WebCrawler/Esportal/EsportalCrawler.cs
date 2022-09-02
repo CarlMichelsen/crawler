@@ -42,6 +42,9 @@ public class EsportalCrawler : ICrawler
     {
         try
         {
+            var attempt = await Handler.GetNext();
+            if (attempt is not null) throw new Exception("No bootstrap was needed");
+
             var next = BootstrapUserEntity();
             var result = await Handler.HandleNext(next);
             var profileWasAdded = await Handler.FinalizeNext(next, result, null);
