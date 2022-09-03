@@ -1,2 +1,2 @@
 # crawler
-A generate purpose webcrawler initially intended for Esportal.
+A general purpose webcrawler initially intended for Esportal.
