@@ -21,7 +21,7 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
     public async Task<UnknownEntity?> GetNext()
     {
         if (_context.UnknownEntity is null) throw new InvalidOperationException("Invalid UnknownEntity DataContext.");
-        var next = await _context.UnknownEntity.Where(unk => unk.Id != 0).Include(unk => unk.User).FirstAsync();
+        var next = await _context.UnknownEntity.Where(unk => unk.Id != 0).Include(unk => unk.User).FirstOrDefaultAsync();
         if (next is null || next.User is null || next?.User.Id == 0) return null;
         return next;
     }

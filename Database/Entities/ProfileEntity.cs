@@ -13,8 +13,6 @@ public class ProfileEntity
     public ulong Flags { get; set; }
     public StatsEntity Stats { get; set; } = new StatsEntity();
     public RecentStatsEntity RecentStats { get; set; } = new RecentStatsEntity();
-    
-    //public List<MatchEntity> MatchDrops { get; set; } = new List<MatchEntity>();
 
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public List<UserEntity> Friends { get; set; } = new List<UserEntity>();

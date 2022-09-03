@@ -126,22 +126,7 @@ namespace Database.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
 
-                    b.Property<int>("Aces")
-                        .HasColumnType("int");
-
                     b.Property<int>("Assists")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AwpDuelWins")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BananaKills")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BombDefuses")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BombPlants")
                         .HasColumnType("int");
 
                     b.Property<int>("Clutches")
@@ -153,34 +138,10 @@ namespace Database.Migrations
                     b.Property<int>("Deaths")
                         .HasColumnType("int");
 
-                    b.Property<int>("Dominations")
-                        .HasColumnType("int");
-
                     b.Property<int>("Drops")
                         .HasColumnType("int");
 
-                    b.Property<int>("EcoAces")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EcoWins")
-                        .HasColumnType("int");
-
                     b.Property<int>("Elo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FragSteals")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GamesAsLegend")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GatherDrops")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GathersCreated")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GathersPlayed")
                         .HasColumnType("int");
 
                     b.Property<int>("Headshots")
@@ -204,13 +165,7 @@ namespace Database.Migrations
                     b.Property<int>("Matches")
                         .HasColumnType("int");
 
-                    b.Property<int>("MidDustKills")
-                        .HasColumnType("int");
-
                     b.Property<int>("Mvps")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OneHpSurvivals")
                         .HasColumnType("int");
 
                     b.Property<int>("OpeningDeaths")
@@ -222,19 +177,10 @@ namespace Database.Migrations
                     b.Property<int>("OpeningKills")
                         .HasColumnType("int");
 
-                    b.Property<int>("OvertimeWins")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PremiumElapsedTime")
-                        .HasColumnType("decimal(20,0)");
-
                     b.Property<decimal?>("Rank")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<int>("Rounds")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Scores100")
                         .HasColumnType("int");
 
                     b.Property<int>("ThumbsDown")
@@ -243,13 +189,7 @@ namespace Database.Migrations
                     b.Property<int>("ThumbsUp")
                         .HasColumnType("int");
 
-                    b.Property<int>("TopFrags")
-                        .HasColumnType("int");
-
                     b.Property<int>("Wins")
-                        .HasColumnType("int");
-
-                    b.Property<int>("kdOver3")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -299,9 +239,6 @@ namespace Database.Migrations
                     b.Property<int?>("Level")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("ProfileEntityId")
-                        .HasColumnType("decimal(20,0)");
-
                     b.Property<int>("RegionId")
                         .HasColumnType("int");
 
@@ -313,8 +250,6 @@ namespace Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProfileEntityId");
 
                     b.ToTable("UserEntity");
                 });
@@ -336,6 +271,21 @@ namespace Database.Migrations
                     b.HasIndex("ProfileEntityId");
 
                     b.ToTable("UsernameEntity");
+                });
+
+            modelBuilder.Entity("ProfileEntityUserEntity", b =>
+                {
+                    b.Property<decimal>("FriendsId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("IncompleteFriendsId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("FriendsId", "IncompleteFriendsId");
+
+                    b.HasIndex("IncompleteFriendsId");
+
+                    b.ToTable("ProfileEntityUserEntity");
                 });
 
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
@@ -368,13 +318,6 @@ namespace Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Database.Entities.UserEntity", b =>
-                {
-                    b.HasOne("Database.Entities.ProfileEntity", null)
-                        .WithMany("Friends")
-                        .HasForeignKey("ProfileEntityId");
-                });
-
             modelBuilder.Entity("Database.Entities.UsernameEntity", b =>
                 {
                     b.HasOne("Database.Entities.ProfileEntity", null)
@@ -382,10 +325,23 @@ namespace Database.Migrations
                         .HasForeignKey("ProfileEntityId");
                 });
 
+            modelBuilder.Entity("ProfileEntityUserEntity", b =>
+                {
+                    b.HasOne("Database.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("FriendsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Database.Entities.ProfileEntity", null)
+                        .WithMany()
+                        .HasForeignKey("IncompleteFriendsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
                 {
-                    b.Navigation("Friends");
-
                     b.Navigation("OldUsernames");
                 });
 #pragma warning restore 612, 618

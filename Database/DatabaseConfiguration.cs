@@ -6,6 +6,6 @@ public class DatabaseConfiguration
 
     public DatabaseConfiguration()
     {
-        ConnectionString = "Server=localhost\\SQLEXPRESS;Database=esportal;Trusted_Connection=True;";
+        ConnectionString = "Server=localhost\\SQLEXPRESS;Database=esportalnew;Trusted_Connection=True;";
     }
 }

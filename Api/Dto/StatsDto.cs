@@ -1,11 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
+namespace Api.Dto;
 
-namespace Database.Entities;
-
-public class StatsEntity
+public class StatsDto
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public ulong Id { get; set; }
     public int Elo { get; set; }
     public int Level { get; set; }
     public int Wins { get; set; }

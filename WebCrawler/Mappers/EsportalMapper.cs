@@ -25,8 +25,6 @@ public static class EsportalMapper
                 .ForMember(s => s.Id, opt => opt.Ignore());
             cfg.CreateMap<ProfileDto, RecentStatsEntity>()
                 .ForMember(s => s.Id, opt => opt.Ignore());
-            cfg.CreateMap<MatchDropDto, MatchEntity>();
-            cfg.CreateMap<CurrentMatchDto, MatchEntity>();
             cfg.CreateMap<UserDto, UserEntity>();
             cfg.CreateMap<FriendDto, UserEntity>();
             cfg.CreateMap<OldUsername, UsernameEntity>();

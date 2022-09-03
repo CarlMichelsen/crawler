@@ -17,35 +17,35 @@ public class EsportalCrawlerController : ControllerBase
 
     private void Log(string input)
     {
-        System.Console.WriteLine($"[Crawler] {input}");
+        Console.WriteLine($"[Crawler] {input}");
     }
 
     [HttpGet("Start")]
-    public ServiceResponse<(ICrawler.CrawlerResponse, string)> Start()
+    public ServiceResponse<string> Start()
     {
-        var res = new ServiceResponse<(ICrawler.CrawlerResponse, string)>();
+        var res = new ServiceResponse<string>();
         var state = _crawler.Start();
-        res.Data = (state, state.ToString());
+        res.Data = state.ToString();
         Log(state.ToString());
         return res;
     }
 
     [HttpGet("Stop")]
-    public ServiceResponse<(ICrawler.CrawlerResponse, string)> Stop()
+    public ServiceResponse<string> Stop()
     {
-        var res = new ServiceResponse<(ICrawler.CrawlerResponse, string)>();
+        var res = new ServiceResponse<string>();
         var state = _crawler.Stop();
-        res.Data = (state, state.ToString());
+        res.Data = state.ToString();
         Log(state.ToString());
         return res;
     }
 
     [HttpGet("Bootstrap")]
-    public async Task<ServiceResponse<(ICrawler.CrawlerResponse, string)>> Bootstrap()
+    public async Task<ServiceResponse<string>> Bootstrap()
     {
-        var res = new ServiceResponse<(ICrawler.CrawlerResponse, string)>();
+        var res = new ServiceResponse<string>();
         var state = await _crawler.Bootstrap();
-        res.Data = (state, state.ToString());
+        res.Data = state.ToString();
         Log(state.ToString());
         return res;
     }

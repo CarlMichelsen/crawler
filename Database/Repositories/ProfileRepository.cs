@@ -40,6 +40,18 @@ public class ProfileRepository
         return allUsers.Where((f) => !exsisting.Any((e) => e?.Id == f.Id)).Select(u => ToUnknown(u)).ToList();
     }
 
+    private static async Task<List<UserEntity>> GetExsistingVersionsOfFriendsYetToBeAdded(List<UserEntity> yetToBeAdded, DataContext db)
+    {
+        if (db.UserEntity is null) throw new NullReferenceException("UserEntity datacontext is null");
+        var returnlist = new List<UserEntity>();
+        foreach (var yet in yetToBeAdded)
+        {
+            var item = await db.UserEntity.FirstOrDefaultAsync(u => u.Id == yet.Id);
+            if (item is not null) returnlist.Add(item);
+        }
+        return returnlist;
+    }
+
     public static async Task<bool> AddProfile(ProfileEntity profile)
     {
         try
@@ -47,8 +59,9 @@ public class ProfileRepository
             using (var context = new DataContext())
             using (var dbContextTransaction = context.Database.BeginTransaction())
             {
-                // only have new UserEntities in friends list
-                profile.Friends = await FindNewUsers(profile.Friends, context); // this is a painpoint
+                // only keep never-before-seen friends in friendslist for now
+                var allFriends = new List<UserEntity>(profile.Friends);
+                profile.Friends = await FindNewUsers(allFriends, context);
 
                 // add ProfileEntity to db
                 if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
@@ -58,6 +71,17 @@ public class ProfileRepository
                 if (context.UnknownEntity is null) throw new NullReferenceException("UnknownEntity datacontext is null");
                 var unknownEntities = await FindNewUnknownUsers(profile.Friends, context);
                 context.UnknownEntity.AddRange(unknownEntities);
+
+                // add the other friends but only by Id TODO: have less awaits in for loops :(
+                var friendsYetToBeAdded = allFriends.Where((f) => {
+                    return !profile.Friends.Any(a => a.Id == f.Id);
+                }).ToList() ?? new List<UserEntity>();
+
+                if (friendsYetToBeAdded.Count() > 0)
+                {
+                    var exsisting = await GetExsistingVersionsOfFriendsYetToBeAdded(friendsYetToBeAdded, context);
+                    profile.Friends.AddRange(exsisting);
+                }
 
                 // Add recorded date
                 profile.Recorded = DateTime.Now;

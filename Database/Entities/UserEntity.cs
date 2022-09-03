@@ -14,4 +14,5 @@ public class UserEntity
     public ulong Flags { get; set; }
     public int RegionId { get; set; }
     public int SubregionId { get; set; }
+    public List<ProfileEntity> IncompleteFriends { get; set; } = new List<ProfileEntity>();
 }

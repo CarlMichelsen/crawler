@@ -68,33 +68,32 @@ namespace Database.Migrations
                     Clutches = table.Column<int>(type: "int", nullable: false),
                     LongestWinningStreak = table.Column<int>(type: "int", nullable: false),
                     LongestLosingStreak = table.Column<int>(type: "int", nullable: false),
-                    TopFrags = table.Column<int>(type: "int", nullable: false),
-                    OvertimeWins = table.Column<int>(type: "int", nullable: false),
-                    Dominations = table.Column<int>(type: "int", nullable: false),
-                    Scores100 = table.Column<int>(type: "int", nullable: false),
-                    kdOver3 = table.Column<int>(type: "int", nullable: false),
-                    BombPlants = table.Column<int>(type: "int", nullable: false),
-                    BombDefuses = table.Column<int>(type: "int", nullable: false),
-                    Aces = table.Column<int>(type: "int", nullable: false),
-                    OneHpSurvivals = table.Column<int>(type: "int", nullable: false),
-                    EcoAces = table.Column<int>(type: "int", nullable: false),
-                    EcoWins = table.Column<int>(type: "int", nullable: false),
-                    FragSteals = table.Column<int>(type: "int", nullable: false),
-                    AwpDuelWins = table.Column<int>(type: "int", nullable: false),
-                    BananaKills = table.Column<int>(type: "int", nullable: false),
-                    MidDustKills = table.Column<int>(type: "int", nullable: false),
-                    GamesAsLegend = table.Column<int>(type: "int", nullable: false),
-                    PremiumElapsedTime = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     ThumbsUp = table.Column<int>(type: "int", nullable: false),
                     ThumbsDown = table.Column<int>(type: "int", nullable: false),
-                    Rank = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
-                    GathersPlayed = table.Column<int>(type: "int", nullable: false),
-                    GathersCreated = table.Column<int>(type: "int", nullable: false),
-                    GatherDrops = table.Column<int>(type: "int", nullable: false)
+                    Rank = table.Column<decimal>(type: "decimal(20,0)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StatsEntity", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserEntity",
+                columns: table => new
+                {
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvatarHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CountryId = table.Column<int>(type: "int", nullable: false),
+                    DisplayMedals = table.Column<int>(type: "int", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: true),
+                    Flags = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    RegionId = table.Column<int>(type: "int", nullable: false),
+                    SubregionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserEntity", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -129,28 +128,47 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserEntity",
+                name: "UnknownEntity",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AvatarHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CountryId = table.Column<int>(type: "int", nullable: false),
-                    DisplayMedals = table.Column<int>(type: "int", nullable: false),
-                    Level = table.Column<int>(type: "int", nullable: true),
-                    Flags = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    RegionId = table.Column<int>(type: "int", nullable: false),
-                    SubregionId = table.Column<int>(type: "int", nullable: false),
-                    ProfileEntityId = table.Column<decimal>(type: "decimal(20,0)", nullable: true)
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserEntity", x => x.Id);
+                    table.PrimaryKey("PK_UnknownEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserEntity_ProfileEntity_ProfileEntityId",
-                        column: x => x.ProfileEntityId,
+                        name: "FK_UnknownEntity_UserEntity_UserId",
+                        column: x => x.UserId,
+                        principalTable: "UserEntity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfileEntityUserEntity",
+                columns: table => new
+                {
+                    FriendsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    IncompleteFriendsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileEntityUserEntity", x => new { x.FriendsId, x.IncompleteFriendsId });
+                    table.ForeignKey(
+                        name: "FK_ProfileEntityUserEntity_ProfileEntity_IncompleteFriendsId",
+                        column: x => x.IncompleteFriendsId,
                         principalTable: "ProfileEntity",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProfileEntityUserEntity_UserEntity_FriendsId",
+                        column: x => x.FriendsId,
+                        principalTable: "UserEntity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -171,26 +189,6 @@ namespace Database.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UnknownEntity",
-                columns: table => new
-                {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UnknownEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UnknownEntity_UserEntity_UserId",
-                        column: x => x.UserId,
-                        principalTable: "UserEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProfileEntity_RecentStatsId",
                 table: "ProfileEntity",
@@ -202,14 +200,14 @@ namespace Database.Migrations
                 column: "StatsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProfileEntityUserEntity_IncompleteFriendsId",
+                table: "ProfileEntityUserEntity",
+                column: "IncompleteFriendsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UnknownEntity_UserId",
                 table: "UnknownEntity",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserEntity_ProfileEntityId",
-                table: "UserEntity",
-                column: "ProfileEntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsernameEntity_ProfileEntityId",
@@ -221,6 +219,9 @@ namespace Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "FailedUnknownEntity");
+
+            migrationBuilder.DropTable(
+                name: "ProfileEntityUserEntity");
 
             migrationBuilder.DropTable(
                 name: "UnknownEntity");

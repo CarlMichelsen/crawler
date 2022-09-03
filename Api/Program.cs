@@ -1,4 +1,4 @@
-using Api;
+using AutoMapper;
 using Database;
 using WebCrawler;
 using WebCrawler.Esportal;
@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 // Dependency Injection
 builder.Services
-    .AddTransient<DataContext>()
+    .AddScoped<DataContext>()
     .AddSingleton<ICrawler, EsportalCrawler>();
 
 var app = builder.Build();
@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
