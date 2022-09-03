@@ -20,9 +20,19 @@ public class EsportalCrawlerController : ControllerBase
         Console.WriteLine($"[Crawler] {input}");
     }
 
-    [HttpGet("Start")]
-    public ServiceResponse<string> Start()
+    private bool ValidPassword(string password)
     {
+        return string.Equals(password, "teddybear");
+    }
+
+    [HttpGet("Start/{password}")]
+    public ServiceResponse<string> Start([FromRoute] string password)
+    {
+        if (!ValidPassword(password))
+        {
+            Log("<Start> Invalid password.");
+            return new ServiceResponse<string>(){Success = false, Error="Invalid password."};
+        }
         var res = new ServiceResponse<string>();
         var state = _crawler.Start();
         res.Data = state.ToString();
@@ -30,9 +40,14 @@ public class EsportalCrawlerController : ControllerBase
         return res;
     }
 
-    [HttpGet("Stop")]
-    public ServiceResponse<string> Stop()
+    [HttpGet("Stop/{password}")]
+    public ServiceResponse<string> Stop([FromRoute] string password)
     {
+        if (!ValidPassword(password))
+        {
+            Log("<Stop> Invalid password.");
+            return new ServiceResponse<string>(){Success = false, Error="Invalid password."};
+        }
         var res = new ServiceResponse<string>();
         var state = _crawler.Stop();
         res.Data = state.ToString();
@@ -40,9 +55,14 @@ public class EsportalCrawlerController : ControllerBase
         return res;
     }
 
-    [HttpGet("Bootstrap")]
-    public async Task<ServiceResponse<string>> Bootstrap()
+    [HttpGet("Bootstrap/{password}")]
+    public async Task<ServiceResponse<string>> Bootstrap([FromRoute] string password)
     {
+        if (!ValidPassword(password))
+        {
+            Log("<Bootstrap> Invalid password.");
+            return new ServiceResponse<string>(){Success = false, Error="Invalid password."};
+        }
         var res = new ServiceResponse<string>();
         var state = await _crawler.Bootstrap();
         res.Data = state.ToString();

@@ -1,4 +1,3 @@
-using AutoMapper;
 using Database;
 using WebCrawler;
 using WebCrawler.Esportal;
