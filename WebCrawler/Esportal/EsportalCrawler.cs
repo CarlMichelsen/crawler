@@ -100,6 +100,11 @@ public class EsportalCrawler : ICrawler
                 var result = await handler.HandleNext(next);
                 await handler.FinalizeNext(next, result, null);
             }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Http exception: \"{e.Message}\" -> stopping crawler");
+                Stop();
+            }
             catch (System.Exception e)
             {
                 if (!string.IsNullOrWhiteSpace(e.InnerException?.Message)) Console.WriteLine(e.InnerException?.Message);

@@ -51,13 +51,23 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
             return default(ProfileEntity);
         }
 
-        // get httpClient
-        var client = ClientFactory();
+        HttpResponseMessage? response = null;
+        try
+        {
+            // get httpClient
+            var client = ClientFactory();
 
-        // send http request
-        var uri = ToUri(next);
-        var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        var response = await client.SendAsync(request);
+            // send http request
+            var uri = ToUri(next);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            response = await client.SendAsync(request);
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw new HttpRequestException("Request failed");
+        }
+        
 
         // read response in stream
         return await HandleRequestResponse(response, next);

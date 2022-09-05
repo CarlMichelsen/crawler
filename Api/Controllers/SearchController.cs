@@ -22,8 +22,8 @@ public class SearchController : ControllerBase
         Console.WriteLine($"[Search] {input}");
     }
 
-    [HttpGet("Username")]
-    public async Task<ServiceResponse<List<ProfileDto>>> Username(string q)
+    [HttpGet("Username/{q}")]
+    public async Task<ServiceResponse<List<ProfileDto>>> Username([FromRoute] string q)
     {
         var res = new ServiceResponse<List<ProfileDto>>();
         try
