@@ -80,14 +80,16 @@ public class EsportalCrawlerController : ControllerBase
     {
         var res = new ServiceResponse<CrawlerStatusResponse>();
         var statusResponse = new CrawlerStatusResponse();
-        
+
         statusResponse.CrawlerName = "EsportalCrawler";
 
         statusResponse.ProfileAmount = await EsportalCrawlerStatusRepository.ProfileCount(_context);
         statusResponse.RemainingUnknowns = await EsportalCrawlerStatusRepository.UnknownCount(_context);
         statusResponse.FailedUnknowns = await EsportalCrawlerStatusRepository.FailedUnknownCount(_context);
 
-        statusResponse.UpTime = DateTime.Now-_crawler.LastStartTime;
+        var span = DateTime.Now-_crawler.LastStartTime;
+
+        statusResponse.SecondsRunning = span?.Seconds ?? 0;
         statusResponse.Status = _crawler.Status.ToString();
         
         res.Data = statusResponse;
