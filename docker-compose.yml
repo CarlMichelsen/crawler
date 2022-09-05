@@ -12,7 +12,7 @@ services:
     ports:
       - 1433:1433
     volumes:
-      - db-vol:/var/opt/mssql
+      - db-vol:${VOLUME_LOCATION}
   api:
     build: .
     ports:
