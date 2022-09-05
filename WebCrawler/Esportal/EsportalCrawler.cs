@@ -5,6 +5,7 @@ namespace WebCrawler.Esportal;
 public class EsportalCrawler : ICrawler
 {
     public ICrawler.CrawlerResponse Status { get; private set; } = ICrawler.CrawlerResponse.CurrentlyStopped;
+    public DateTime? LastStartTime { get; set; }
     public EsportalRequestHandler Handler;
     private Timer? _timer = null;
 
@@ -20,6 +21,7 @@ public class EsportalCrawler : ICrawler
         if (_timer is not null) return ICrawler.CrawlerResponse.CurrentlyStarted;
         _timer = new(TimerCallbackFactory(), Handler, TimeSpan.Zero, TimeSpan.FromMilliseconds(2500));
         Status = ICrawler.CrawlerResponse.CurrentlyStarted;
+        LastStartTime = DateTime.Now;
         return ICrawler.CrawlerResponse.Started;
     }
 
@@ -31,6 +33,7 @@ public class EsportalCrawler : ICrawler
             _timer.Dispose();
             _timer = null;
             Status = ICrawler.CrawlerResponse.CurrentlyStopped;
+            LastStartTime = null;
             return ICrawler.CrawlerResponse.Stopped;
         }
         catch (System.Exception e)

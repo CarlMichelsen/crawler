@@ -35,8 +35,9 @@ public class SearchController : ControllerBase
         }
         catch (System.Exception e)
         {
+            Log(e.Message);
             res.Success = false;
-            res.Error = e.Message;
+            res.Error = "Search failed.";
         }
         return res;
     }

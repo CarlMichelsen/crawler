@@ -11,8 +11,8 @@ public interface ICrawler
         Success,
         Failure
     }
-
     public CrawlerResponse Status { get; }
+    public DateTime? LastStartTime { get; }
     public CrawlerResponse Start();
     public CrawlerResponse Stop();
     public Task<CrawlerResponse> Bootstrap();

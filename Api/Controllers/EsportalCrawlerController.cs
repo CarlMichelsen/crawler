@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Api.Models;
 using WebCrawler;
+using Database;
+using Database.Repositories;
 
 namespace Api.Controllers;
 
@@ -9,21 +11,17 @@ namespace Api.Controllers;
 public class EsportalCrawlerController : ControllerBase
 {
     private readonly ICrawler _crawler;
+    private readonly DataContext _context;
 
-    public EsportalCrawlerController(ICrawler crawler)
+    public EsportalCrawlerController(ICrawler crawler, DataContext context)
     {
         _crawler = crawler;
+        _context = context;
     }
 
-    private void Log(string input)
-    {
-        Console.WriteLine($"[Crawler] {input}");
-    }
+    private void Log(string input) => Console.WriteLine($"[Crawler] {input}");
 
-    private bool ValidPassword(string password)
-    {
-        return string.Equals(password, "teddybear");
-    }
+    private bool ValidPassword(string password) => string.Equals(password, "teddybear");
 
     [HttpPost("Start")]
     public ServiceResponse<string> Start([FromBody] string password)
@@ -78,11 +76,22 @@ public class EsportalCrawlerController : ControllerBase
     }
 
     [HttpGet("Status")]
-    public ServiceResponse<string> GetStatus()
+    public async Task<ServiceResponse<CrawlerStatusResponse>> GetStatus()
     {
-        var res = new ServiceResponse<string>();
-        res.Data = _crawler.Status.ToString();
-        Log($"Status: {_crawler.Status.ToString()}");
+        var res = new ServiceResponse<CrawlerStatusResponse>();
+        var statusResponse = new CrawlerStatusResponse();
+        
+        statusResponse.CrawlerName = "EsportalCrawler";
+
+        statusResponse.ProfileAmount = await EsportalCrawlerStatusRepository.ProfileCount(_context);
+        statusResponse.RemainingUnknowns = await EsportalCrawlerStatusRepository.UnknownCount(_context);
+        statusResponse.FailedUnknowns = await EsportalCrawlerStatusRepository.FailedUnknownCount(_context);
+
+        statusResponse.UpTime = DateTime.Now-_crawler.LastStartTime;
+        statusResponse.Status = _crawler.Status.ToString();
+        
+        res.Data = statusResponse;
+        Log($"Status: {statusResponse.Status.ToString()}");
         return res;
     }
 }
