@@ -6,6 +6,7 @@ public class DatabaseConfiguration
 
     public DatabaseConfiguration()
     {
-        ConnectionString = "Server=localhost\\SQLEXPRESS;Database=esportalnew;Trusted_Connection=True;";
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        ConnectionString = databaseUrl ?? "Server=localhost\\SQLEXPRESS;Database=esportal;Trusted_Connection=True;";
     }
 }

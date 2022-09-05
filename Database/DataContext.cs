@@ -8,7 +8,7 @@ public class DataContext : DbContext
 {
     public DataContext() : base()
     {
-        
+        if (Database.CanConnect()) Database.EnsureCreated();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -29,4 +29,5 @@ public class DataContext : DbContext
     public DbSet<UnknownEntity>? UnknownEntity { get; set; }
     public DbSet<UserEntity>? UserEntity { get; set; }
     public DbSet<FailedUnknownEntity>? FailedUnknownEntity { get; set; }
+    public DbSet<ProfileConnectionEntity>? ProfileConnectionEntity { get; set; }
 }

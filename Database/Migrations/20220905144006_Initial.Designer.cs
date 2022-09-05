@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Database.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220903150046_SteamId64")]
-    partial class SteamId64
+    [Migration("20220905144006_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,6 +46,22 @@ namespace Database.Migrations
                     b.ToTable("FailedUnknownEntity");
                 });
 
+            modelBuilder.Entity("Database.Entities.ProfileConnectionEntity", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(20,0)");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"), 1L, 1);
+
+                    b.Property<string>("SteamId64")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProfileConnectionEntity");
+                });
+
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
                 {
                     b.Property<decimal>("Id")
@@ -64,6 +80,9 @@ namespace Database.Migrations
                     b.Property<decimal>("Flags")
                         .HasColumnType("decimal(20,0)");
 
+                    b.Property<decimal?>("ProfileConnectionsId")
+                        .HasColumnType("decimal(20,0)");
+
                     b.Property<decimal>("RecentStatsId")
                         .HasColumnType("decimal(20,0)");
 
@@ -73,14 +92,13 @@ namespace Database.Migrations
                     b.Property<decimal>("StatsId")
                         .HasColumnType("decimal(20,0)");
 
-                    b.Property<string>("SteamId64")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProfileConnectionsId");
 
                     b.HasIndex("RecentStatsId");
 
@@ -295,6 +313,10 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Entities.ProfileEntity", b =>
                 {
+                    b.HasOne("Database.Entities.ProfileConnectionEntity", "ProfileConnections")
+                        .WithMany()
+                        .HasForeignKey("ProfileConnectionsId");
+
                     b.HasOne("Database.Entities.RecentStatsEntity", "RecentStats")
                         .WithMany()
                         .HasForeignKey("RecentStatsId")
@@ -306,6 +328,8 @@ namespace Database.Migrations
                         .HasForeignKey("StatsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ProfileConnections");
 
                     b.Navigation("RecentStats");
 

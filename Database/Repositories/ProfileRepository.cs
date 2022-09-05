@@ -85,6 +85,7 @@ public class ProfileRepository
 
                 // Add recorded date
                 profile.Recorded = DateTime.Now;
+                profile.ProfileConnections = null;
 
                 // save and exit
                 context.SaveChanges();

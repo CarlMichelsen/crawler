@@ -11,25 +11,31 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Configuration
+    .AddEnvironmentVariables();
+
 // Dependency Injection
 builder.Services
-    .AddScoped<DataContext>()
+    .AddTransient<DataContext>()
     .AddSingleton<ICrawler, EsportalCrawler>();
 
+builder.Services.AddHealthChecks();
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
+
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
+//app.Environment.IsDevelopment()
+
+// keep swagger in prod
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    //options.RoutePrefix = string.Empty;
+    options.RoutePrefix = string.Empty;
 });
-//}
 
-//app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); not ready for this yet
 
 app.UseAuthorization();
 

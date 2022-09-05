@@ -25,8 +25,8 @@ public class EsportalCrawlerController : ControllerBase
         return string.Equals(password, "teddybear");
     }
 
-    [HttpGet("Start/{password}")]
-    public ServiceResponse<string> Start([FromRoute] string password)
+    [HttpPost("Start")]
+    public ServiceResponse<string> Start([FromBody] string password)
     {
         if (!ValidPassword(password))
         {
@@ -35,13 +35,15 @@ public class EsportalCrawlerController : ControllerBase
         }
         var res = new ServiceResponse<string>();
         var state = _crawler.Start();
+        if (state == ICrawler.CrawlerResponse.Failure) res.Success = false;
+
         res.Data = state.ToString();
         Log(state.ToString());
         return res;
     }
 
-    [HttpGet("Stop/{password}")]
-    public ServiceResponse<string> Stop([FromRoute] string password)
+    [HttpPost("Stop")]
+    public ServiceResponse<string> Stop([FromBody] string password)
     {
         if (!ValidPassword(password))
         {
@@ -50,23 +52,37 @@ public class EsportalCrawlerController : ControllerBase
         }
         var res = new ServiceResponse<string>();
         var state = _crawler.Stop();
+        if (state == ICrawler.CrawlerResponse.Failure) res.Success = false;
+
         res.Data = state.ToString();
         Log(state.ToString());
         return res;
     }
 
-    [HttpGet("Bootstrap/{password}")]
-    public async Task<ServiceResponse<string>> Bootstrap([FromRoute] string password)
+    [HttpPost("Bootstrap")]
+    public async Task<ServiceResponse<string>> Bootstrap([FromBody] string password)
     {
         if (!ValidPassword(password))
         {
             Log("<Bootstrap> Invalid password.");
             return new ServiceResponse<string>(){Success = false, Error="Invalid password."};
         }
+
         var res = new ServiceResponse<string>();
         var state = await _crawler.Bootstrap();
         res.Data = state.ToString();
+        if (state == ICrawler.CrawlerResponse.Failure) res.Success = false;
+        
         Log(state.ToString());
+        return res;
+    }
+
+    [HttpGet("Status")]
+    public ServiceResponse<string> GetStatus()
+    {
+        var res = new ServiceResponse<string>();
+        res.Data = _crawler.Status.ToString();
+        Log($"Status: {_crawler.Status.ToString()}");
         return res;
     }
 }

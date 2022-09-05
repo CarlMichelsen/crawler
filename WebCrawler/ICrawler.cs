@@ -12,6 +12,7 @@ public interface ICrawler
         Failure
     }
 
+    public CrawlerResponse Status { get; }
     public CrawlerResponse Start();
     public CrawlerResponse Stop();
     public Task<CrawlerResponse> Bootstrap();

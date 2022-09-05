@@ -1,0 +1,28 @@
+---
+version: "3.8"
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_PID: Express
+      SA_PASSWORD: ${SA_PASSWORD}
+      LC_ALL: en_US.UTF-8
+    ports:
+      - 1433:1433
+    volumes:
+      - db-vol:/var/opt/mssql
+  api:
+    build: .
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DOTNET_RUNNING_IN_CONTAINER: 1
+      DATABASE_URL: "${DATABASE_URL}Password=${SA_PASSWORD};"
+    depends_on:
+      - db
+
+volumes:
+  db-vol:

@@ -25,6 +25,19 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProfileConnectionEntity",
+                columns: table => new
+                {
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SteamId64 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileConnectionEntity", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RecentStatsEntity",
                 columns: table => new
                 {
@@ -106,6 +119,7 @@ namespace Database.Migrations
                     AvatarHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CountryId = table.Column<int>(type: "int", nullable: false),
                     Flags = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    ProfileConnectionsId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
                     StatsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     RecentStatsId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     Recorded = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -113,6 +127,11 @@ namespace Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProfileEntity", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfileEntity_ProfileConnectionEntity_ProfileConnectionsId",
+                        column: x => x.ProfileConnectionsId,
+                        principalTable: "ProfileConnectionEntity",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProfileEntity_RecentStatsEntity_RecentStatsId",
                         column: x => x.RecentStatsId,
@@ -190,6 +209,11 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProfileEntity_ProfileConnectionsId",
+                table: "ProfileEntity",
+                column: "ProfileConnectionsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProfileEntity_RecentStatsId",
                 table: "ProfileEntity",
                 column: "RecentStatsId");
@@ -234,6 +258,9 @@ namespace Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProfileEntity");
+
+            migrationBuilder.DropTable(
+                name: "ProfileConnectionEntity");
 
             migrationBuilder.DropTable(
                 name: "RecentStatsEntity");
