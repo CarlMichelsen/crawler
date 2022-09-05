@@ -89,7 +89,7 @@ public class EsportalCrawlerController : ControllerBase
 
         var span = DateTime.Now-_crawler.LastStartTime;
 
-        statusResponse.SecondsRunning = span?.Seconds ?? 0;
+        statusResponse.SecondsRunning = span?.TotalSeconds ?? 0;
         statusResponse.Status = _crawler.Status.ToString();
         
         res.Data = statusResponse;

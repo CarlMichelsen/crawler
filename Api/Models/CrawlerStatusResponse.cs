@@ -7,5 +7,5 @@ public class CrawlerStatusResponse
     public int RemainingUnknowns { get; set; }
     public int FailedUnknowns { get; set; }
     public string Status { get; set; } = string.Empty;
-    public int SecondsRunning { get; set; }
+    public double SecondsRunning { get; set; }
 }
