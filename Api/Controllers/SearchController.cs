@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Api.Models;
 using Database.Repositories;
 using Database;
 using Api.Dto;

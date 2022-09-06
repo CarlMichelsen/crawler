@@ -1,4 +1,4 @@
-namespace Api.Models;
+namespace Api.Dto;
 
 public class ServiceResponse<T>
 {

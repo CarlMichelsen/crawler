@@ -1,6 +1,6 @@
-namespace Api.Models;
+namespace Api.Dto;
 
-public class CrawlerStatusResponse
+public class CrawlerStatusDto
 {
     public string CrawlerName { get; set; } = string.Empty;
     public int ProfileAmount { get; set; }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Api.Models;
+using Api.Dto;
 using WebCrawler;
 using Database;
 using Database.Repositories;
@@ -76,10 +76,10 @@ public class EsportalCrawlerController : ControllerBase
     }
 
     [HttpGet("Status")]
-    public async Task<ServiceResponse<CrawlerStatusResponse>> GetStatus()
+    public async Task<ServiceResponse<CrawlerStatusDto>> GetStatus()
     {
-        var res = new ServiceResponse<CrawlerStatusResponse>();
-        var statusResponse = new CrawlerStatusResponse();
+        var res = new ServiceResponse<CrawlerStatusDto>();
+        var statusResponse = new CrawlerStatusDto();
 
         statusResponse.CrawlerName = "EsportalCrawler";
 
