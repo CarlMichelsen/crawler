@@ -32,4 +32,5 @@ msbuild.wrn
 
 appsettings*
 
-.env*
+.env
+.env.*
