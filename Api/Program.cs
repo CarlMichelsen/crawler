@@ -18,7 +18,6 @@ builder.Configuration
 builder.Services
     .AddTransient<DataContext>()
     .AddSingleton<ICrawler, EsportalCrawler>()
-    .AddSingleton<ICrawler, EsportalSteamCrawler>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
