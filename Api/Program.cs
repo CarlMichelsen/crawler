@@ -17,7 +17,7 @@ builder.Configuration
 // Dependency Injection
 builder.Services
     .AddTransient<DataContext>()
-    .AddSingleton<ICrawler, EsportalCrawler>()
+    .AddSingleton<ICrawler, EsportalCrawler>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
