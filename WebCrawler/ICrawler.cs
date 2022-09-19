@@ -1,19 +1,8 @@
 namespace WebCrawler;
 
-public interface ICrawler
+public interface ICrawler<T>
 {
-    public enum CrawlerResponse
-    {
-        Started,
-        Stopped,
-        CurrentlyStarted,
-        CurrentlyStopped,
-        Success,
-        Failure
-    }
-    public CrawlerResponse Status { get; }
-    public DateTime? LastStartTime { get; }
-    public CrawlerResponse Start();
-    public CrawlerResponse Stop();
-    public Task<CrawlerResponse> Bootstrap();
+    public Task<T?> Next();
+
+    public Task<bool> Act(T? input);
 }

@@ -84,11 +84,11 @@ public class EsportalRequestHandler : IRequestHandler<UnknownEntity, ProfileEnti
     private string StringFromUnknown(ProfileEntity profile)
     {
         StringBuilder sb = new(profile.Username);
-        sb.Append(new string(' ', Math.Clamp(17-profile.Username.Length, 2, 17)));
+        sb.Append(new string(' ', Math.Clamp(20-profile.Username.Length, 2, 20)));
         sb.Append(profile.Stats.Elo);
         sb.Append(new string(' ', Math.Clamp(8-profile.Stats.Elo.ToString().Length, 2, 8)));
         sb.Append($">{profile.Id}<");
-        sb.Append(new string(' ', Math.Clamp(14-profile.Id.ToString().Length, 2, 14)));
+        sb.Append(new string(' ', Math.Clamp(16-profile.Id.ToString().Length, 2, 16)));
         sb.Append(profile.Recorded.ToString());
         return sb.ToString();
     }

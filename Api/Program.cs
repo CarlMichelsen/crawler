@@ -1,6 +1,5 @@
 using Database;
-using WebCrawler;
-using WebCrawler.Esportal;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +15,9 @@ builder.Configuration
 
 // Dependency Injection
 builder.Services
-    .AddTransient<DataContext>()
-    .AddSingleton<ICrawler, EsportalCrawler>();
+    .AddTransient<DataContext>();
+
+builder.Services.AddHostedService<EsportalService>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
