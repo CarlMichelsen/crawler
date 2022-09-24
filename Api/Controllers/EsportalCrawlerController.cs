@@ -29,6 +29,7 @@ public class EsportalCrawlerController : ControllerBase
         statusResponse.ProfileAmount = await EsportalCrawlerStatusRepository.ProfileCount(_context);
         statusResponse.RemainingUnknowns = await EsportalCrawlerStatusRepository.UnknownCount(_context);
         statusResponse.FailedUnknowns = await EsportalCrawlerStatusRepository.FailedUnknownCount(_context);
+        statusResponse.SteamIdCount = await EsportalCrawlerStatusRepository.SteamIdCount(_context);
         
         res.Data = statusResponse.ToString();
         Log($"Status: {res.Data}");
