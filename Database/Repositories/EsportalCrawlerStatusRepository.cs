@@ -22,4 +22,10 @@ public static class EsportalCrawlerStatusRepository
         if (db.FailedUnknownEntity is null) throw new NullReferenceException("FailedUnknownEntity null");
         return await db.FailedUnknownEntity.CountAsync();
     }
+
+    public static async Task<int> SteamIdCount(DataContext db)
+    {
+        if (db.ProfileConnectionEntity is null) throw new NullReferenceException("ProfileConnectionEntity null");
+        return await db.ProfileConnectionEntity.Where(c => c.SteamId64 != null).CountAsync();
+    }
 }
