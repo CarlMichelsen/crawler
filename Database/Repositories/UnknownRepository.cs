@@ -1,4 +1,3 @@
-using Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repositories;

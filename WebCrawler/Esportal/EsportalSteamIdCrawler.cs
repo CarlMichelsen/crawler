@@ -20,10 +20,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
     {
         if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
         Console.WriteLine("Attempting to get next SteamIdProfileEntity");
-        var next = await _context.ProfileEntity
-            .Include(pro => pro.ProfileConnections)
-            .Where(pro => pro.ProfileConnections == null || pro.ProfileConnections.SteamId64 == null)
-            .FirstOrDefaultAsync();
+        var next = await EsportalSteamIdRepository.GetNextSteamIdCandidate(_context);
 
         Console.WriteLine($"Found {next?.Username ?? string.Empty}");
         return next;

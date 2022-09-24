@@ -33,6 +33,16 @@ public class EsportalSteamIdRepository
         }
     }
 
+    public static async Task<ProfileEntity?> GetNextSteamIdCandidate(DataContext db)
+    {
+        if (db.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
+        return await db.ProfileEntity
+            .Include(pro => pro.ProfileConnections)
+            .Where(pro => pro.ProfileConnections == null || pro.ProfileConnections.SteamId64 == null)
+            .OrderByDescending(pro => pro.Friends.Count())
+            .FirstOrDefaultAsync();
+    }
+
     public static async Task<bool> UpsertSteamId(ulong userId, string steamId)
     {
         try
