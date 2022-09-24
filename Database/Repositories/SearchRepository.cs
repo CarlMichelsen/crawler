@@ -40,6 +40,7 @@ public class SearchRepository
             .Where(pro => minFriends != null ? pro.Friends.Count() >= minFriends : true)
             .Where(pro => username != null ? pro.Username.ToLower().StartsWith(username) : true)
             .OrderBy(opt => username != null ? opt.Username.Length-username.Length : 0)
+            .OrderByDescending(pro => username == null ? pro.Friends.Count() : 0)
             .Take(clampedAmount)
             .ToListAsync();
     }

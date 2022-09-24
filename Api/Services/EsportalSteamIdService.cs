@@ -27,6 +27,7 @@ public class EsportalSteamIdService : BackgroundService
 
         var item = await _crawler.Next();
         var success = await _crawler.Act(item);
+        Console.WriteLine($"alalala {success}");
 
         if (success)
         {
@@ -37,7 +38,7 @@ public class EsportalSteamIdService : BackgroundService
             _retries++;
         }
 
-        var delay = _baseDelay + _baseDelay * Math.Pow(_retries, 2) * 10;
+        var delay = _baseDelay + _baseDelay * Math.Pow(_retries*0.2, 2) * 10;
         return (int)(delay);
     }
 

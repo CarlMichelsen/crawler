@@ -21,7 +21,6 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
         Console.WriteLine("Attempting to get next SteamIdProfileEntity");
         var next = await EsportalSteamIdRepository.GetNextSteamIdCandidate(_context);
-
         Console.WriteLine($"Found {next?.Username ?? string.Empty}");
         return next;
     }
@@ -45,7 +44,8 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
             var res = await client.SendAsync(req);
             if (res.IsSuccessStatusCode)
             {
-                return await res.Content.ReadAsStringAsync();
+                var str = await res.Content.ReadAsStringAsync();
+                return str;
             } else {
                 throw new Exception("request failed");
             }
@@ -86,10 +86,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
 
     public async Task<bool> Act(ProfileEntity? input)
     {
-        if (input is null)
-        {
-            return false;
-        }
+        if (input is null) return false;
         if (_context.ProfileConnectionEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
         var steamIdServiceUrl = Environment.GetEnvironmentVariable("STEAMID_SERVICE_URL") ?? "http://157.245.20.228:8080";
         var requestUri = new Uri($"{steamIdServiceUrl}/esportal-steamid/{input.Username}");
