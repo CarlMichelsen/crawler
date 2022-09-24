@@ -18,6 +18,7 @@ builder.Services
     .AddTransient<DataContext>();
 
 builder.Services.AddHostedService<EsportalService>();
+builder.Services.AddHostedService<EsportalSteamIdService>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
