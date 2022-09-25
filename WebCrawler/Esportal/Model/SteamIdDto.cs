@@ -10,6 +10,9 @@ public class SteamIdDto
     [JsonPropertyName("cached")]
     public bool Cached { get; set; }
 
+    [JsonPropertyName("transientError")]
+    public bool TransientError { get; set; }
+
     [JsonPropertyName("steamId")]
     public string? SteamId { get; set; }
 }

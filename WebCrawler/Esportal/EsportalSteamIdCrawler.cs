@@ -70,7 +70,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         }
         finally
         {
-            if (temp is not null) 
+            if (temp is not null)
             {
                 profile = temp;
             }
@@ -96,6 +96,10 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         if (responseDto?.Success == true && responseDto?.SteamId is not null)
         {
             return await EsportalSteamIdRepository.UpsertSteamId(input.Id, responseDto.SteamId);
+        }
+        else if (responseDto?.TransientError == true)
+        {
+            return await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
         }
         return false;
     }
