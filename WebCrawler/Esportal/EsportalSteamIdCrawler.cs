@@ -95,11 +95,17 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         if (!successfulSerialization) return false;
         if (responseDto?.Success == true && responseDto?.SteamId is not null)
         {
-            return await EsportalSteamIdRepository.UpsertSteamId(input.Id, responseDto.SteamId);
+            var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, responseDto.SteamId);
+            var actionString = success  ? "Saved" : "Failed to save";
+            Console.WriteLine($"{actionString} {responseDto.SteamId} as steamid for {input.Username}");
+            return success;
         }
         else if (responseDto?.TransientError == true)
         {
-            return await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
+            var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
+            var actionString = success  ? "Saved" : "Failed to save";
+            Console.WriteLine($"{actionString} {responseDto.SteamId} as steamid for {input.Username}");
+            return success;
         }
         return false;
     }

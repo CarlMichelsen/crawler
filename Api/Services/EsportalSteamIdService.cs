@@ -27,7 +27,6 @@ public class EsportalSteamIdService : BackgroundService
 
         var item = await _crawler.Next();
         var success = await _crawler.Act(item);
-        Console.WriteLine($"alalala {success}");
 
         if (success)
         {
