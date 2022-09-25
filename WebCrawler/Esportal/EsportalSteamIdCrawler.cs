@@ -100,7 +100,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
             Console.WriteLine($"{actionString} {responseDto.SteamId} as steamid for {input.Username}");
             return success;
         }
-        else if (responseDto?.TransientError == true)
+        else if (responseDto?.TransientError == false)
         {
             var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
             var actionString = success  ? "Saved" : "Failed to save";
