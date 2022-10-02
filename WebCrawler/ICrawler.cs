@@ -4,5 +4,5 @@ public interface ICrawler<T>
 {
     public Task<T?> Next();
 
-    public Task<bool> Act(T? input);
+    public Task<bool> Act(ulong? userId);
 }

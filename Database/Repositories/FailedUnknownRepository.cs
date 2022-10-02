@@ -5,11 +5,10 @@ namespace Database.Repositories;
 
 public static class FailedUnknownRepository
 {
-    public static async Task<bool> AddFailedUnknown(FailedUnknownEntity failedUnknown)
+    public static async Task<bool> AddFailedUnknown(DataContext context, FailedUnknownEntity failedUnknown)
     {
         try
         {
-            using (var context = new DataContext())
             using (var dbContextTransaction = context.Database.BeginTransaction())
             {
                 if (context.FailedUnknownEntity is null) throw new NullReferenceException("Datacontext FailedUnknownEntity is null.");

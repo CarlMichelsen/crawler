@@ -17,4 +17,16 @@ public class ProfileEntity
     public List<UserEntity> Friends { get; set; } = new List<UserEntity>();
     public List<UsernameEntity> OldUsernames { get; set; } = new List<UsernameEntity>();
     public DateTime Recorded { get; set; }
+
+    public override string ToString()
+    {
+        System.Text.StringBuilder sb = new(Username);
+        sb.Append(new string(' ', Math.Clamp(20-Username.Length, 2, 20)));
+        sb.Append(Stats.Elo);
+        sb.Append(new string(' ', Math.Clamp(8-Stats.Elo.ToString().Length, 2, 8)));
+        sb.Append($">{Id}<");
+        sb.Append(new string(' ', Math.Clamp(16-Id.ToString().Length, 2, 16)));
+        sb.Append(Recorded.ToString());
+        return sb.ToString();
+    }
 }

@@ -1,5 +1,7 @@
 using Database;
 using Services;
+using WebCrawler.Esportal;
+using WebCrawler.Esportal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +17,15 @@ builder.Configuration
 
 // Dependency Injection
 builder.Services
-    .AddTransient<DataContext>();
+    .AddTransient<DataContext>()
+    .AddTransient<EsportalCrawler>()
+    .AddTransient<EsportalSteamIdCrawler>()
+    .AddTransient<EsportalProfileService>();
 
 builder.Services.AddHostedService<EsportalService>();
 builder.Services.AddHostedService<EsportalSteamIdService>();
+
+builder.Services.AddHttpClient<EsportalService>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
@@ -28,7 +35,7 @@ app.MapHealthChecks("/health");
 // Configure the HTTP request pipeline.
 //app.Environment.IsDevelopment()
 
-// keep swagger in prod
+// keep swagger in prod (for now)
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {

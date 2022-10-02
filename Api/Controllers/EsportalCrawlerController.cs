@@ -16,21 +16,21 @@ public class EsportalCrawlerController : ControllerBase
         _context = context;
     }
 
-    private void Log(string input) => Console.WriteLine($"[Crawler] {input}");
+    private static void Log(string input) => Console.WriteLine($"[Crawler] {input}");
 
     [HttpGet("Status")]
     public async Task<ServiceResponse<string>> GetStatus()
     {
         var res = new ServiceResponse<string>();
-        var statusResponse = new CrawlerStatusDto();
+        var statusResponse = new CrawlerStatusDto
+        {
+            CrawlerName = "EsportalCrawler",
+            ProfileAmount = await EsportalCrawlerStatusRepository.ProfileCount(_context),
+            RemainingUnknowns = await EsportalCrawlerStatusRepository.UnknownCount(_context),
+            FailedUnknowns = await EsportalCrawlerStatusRepository.FailedUnknownCount(_context),
+            SteamIdCount = await EsportalCrawlerStatusRepository.SteamIdCount(_context)
+        };
 
-        statusResponse.CrawlerName = "EsportalCrawler";
-
-        statusResponse.ProfileAmount = await EsportalCrawlerStatusRepository.ProfileCount(_context);
-        statusResponse.RemainingUnknowns = await EsportalCrawlerStatusRepository.UnknownCount(_context);
-        statusResponse.FailedUnknowns = await EsportalCrawlerStatusRepository.FailedUnknownCount(_context);
-        statusResponse.SteamIdCount = await EsportalCrawlerStatusRepository.SteamIdCount(_context);
-        
         res.Data = statusResponse.ToString();
         Log($"Status: {res.Data}");
         return res;

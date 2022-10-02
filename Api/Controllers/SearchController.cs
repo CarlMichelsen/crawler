@@ -10,14 +10,14 @@ namespace Api.Controllers;
 [Route("[controller]")]
 public class SearchController : ControllerBase
 {
-    private DataContext _context;
+    private readonly DataContext _context;
 
     public SearchController(DataContext context)
     {
         _context = context;
     }
 
-    private void Log(string input)
+    private static void Log(string input)
     {
         Console.WriteLine($"[Search] {input}");
     }
@@ -31,7 +31,7 @@ public class SearchController : ControllerBase
             Log($"Username Search: {q}");
             var resultList = await SearchRepository.NameSearch(q, _context);
             List<ProfileDto> dtoList = resultList.Select(p => ApiMapper.Mapper.Map<ProfileDto>(p)).ToList();
-            Log($"Found {resultList.Count()} results from username search: \"{q}\"");
+            Log($"Found {resultList.Count} results from username search: \"{q}\"");
             res.Data = dtoList;
         }
         catch (System.Exception e)
@@ -52,7 +52,7 @@ public class SearchController : ControllerBase
             Log($"Username Search: {search}");
             var resultList = await SearchRepository.FilterSearch(search, _context);
             List<ProfileDto> dtoList = resultList.Select(p => ApiMapper.Mapper.Map<ProfileDto>(p)).ToList();
-            Log($"Found {resultList.Count()} results from filter search: \"{search}\"");
+            Log($"Found {resultList.Count} results from filter search: \"{search}\"");
             res.Data = dtoList;
         }
         catch (System.Exception e)

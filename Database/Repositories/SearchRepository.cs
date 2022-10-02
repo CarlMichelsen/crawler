@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repositories;
 
-public class SearchRepository
+public static class SearchRepository
 {
     public static async Task<List<ProfileEntity>> NameSearch(string search, DataContext db)
     {
@@ -35,12 +35,13 @@ public class SearchRepository
             .Include(opt => opt.Stats)
             .Include(opt => opt.OldUsernames)
             .Include(opt => opt.Friends)
-            .Where(pro => max != null ? pro.Stats.Elo <= max : true)
-            .Where(pro => min != null ? pro.Stats.Elo >= min : true)
-            .Where(pro => minFriends != null ? pro.Friends.Count() >= minFriends : true)
-            .Where(pro => username != null ? pro.Username.ToLower().StartsWith(username) : true)
+            .Where(pro => max == null || pro.Stats.Elo <= max)
+            .Where(pro => min == null || pro.Stats.Elo >= min)
+            .Where(pro => minFriends == null || pro.Friends.Count >= minFriends)
+            .Where(pro => username == null || pro.Username.ToLower()
+            .StartsWith(username))
             .OrderBy(opt => username != null ? opt.Username.Length-username.Length : 0)
-            .OrderByDescending(pro => username == null ? pro.Friends.Count() : 0)
+            .OrderByDescending(pro => username == null ? pro.Friends.Count : 0)
             .Take(clampedAmount)
             .ToListAsync();
     }

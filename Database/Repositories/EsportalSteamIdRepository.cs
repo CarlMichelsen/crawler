@@ -3,34 +3,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repositories;
 
-public class EsportalSteamIdRepository
+public static class EsportalSteamIdRepository
 {
     private static async Task UpsertSteamIdTransaction(ulong userId, string? steamId)
     {
-        using (var context = new DataContext())
-        using (var dbContextTransaction = context.Database.BeginTransaction())
+        using var context = new DataContext();
+        using var dbContextTransaction = context.Database.BeginTransaction();
+        if (context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
+        var profile = context.ProfileEntity
+            .Where(pro => pro.Id == userId)
+            .Include(pro => pro.ProfileConnections)
+            .FirstOrDefault();
+        if (profile is null) throw new Exception($"No profile with userId {userId} found!");
+
+        if (profile.ProfileConnections is null)
         {
-            if (context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
-            var profile = context.ProfileEntity
-                .Where(pro => pro.Id == userId)
-                .Include(pro => pro.ProfileConnections)
-                .FirstOrDefault();
-            if (profile is null) throw new Exception($"No profile with userId {userId} found!");
-
-            if (profile.ProfileConnections is null)
+            var conn = new ProfileConnectionEntity
             {
-                var conn = new ProfileConnectionEntity();
-                conn.SteamId64 = steamId;
-                profile.ProfileConnections = conn;
-            }
-            else
-            {
-                profile.ProfileConnections.SteamId64 = steamId;
-            }
-
-            context.SaveChanges();
-            await dbContextTransaction.CommitAsync();
+                SteamId64 = steamId
+            };
+            profile.ProfileConnections = conn;
         }
+        else
+        {
+            profile.ProfileConnections.SteamId64 = steamId;
+        }
+
+        context.SaveChanges();
+        await dbContextTransaction.CommitAsync();
     }
 
     public static async Task<ProfileEntity?> GetNextSteamIdCandidate(DataContext db)
@@ -39,7 +39,7 @@ public class EsportalSteamIdRepository
         return await db.ProfileEntity
             .Include(pro => pro.ProfileConnections)
             .Where(pro => pro.ProfileConnections == null)
-            .OrderByDescending(pro => pro.Friends.Count())
+            .OrderByDescending(pro => pro.Friends.Count)
             .FirstOrDefaultAsync();
     }
 

@@ -4,17 +4,17 @@ namespace Services;
 
 public class EsportalSteamIdService : BackgroundService
 {
-    private EsportalSteamIdCrawler _crawler;
+    private readonly EsportalSteamIdCrawler _crawler;
     private double _retries;
-    private double _baseDelay;
+    private readonly double _baseDelay;
     private double _currentDelay;
     
     private PeriodicTimer _timer;
     
 
-    public EsportalSteamIdService()
+    public EsportalSteamIdService(EsportalSteamIdCrawler crawler)
     {
-        _crawler = new();
+        _crawler = crawler;
         _retries = 0;
         _baseDelay = 8000;
         _currentDelay = _baseDelay;
@@ -25,8 +25,9 @@ public class EsportalSteamIdService : BackgroundService
     {
         if (_retries>100) throw new Exception("Too many retries.");
 
-        var item = await _crawler.Next();
-        var success = await _crawler.Act(item);
+        var profileEntity = await _crawler.Next();
+        var userId = profileEntity?.Id;
+        var success = await _crawler.Act(userId);
 
         if (success)
         {
@@ -38,12 +39,12 @@ public class EsportalSteamIdService : BackgroundService
         }
 
         var delay = _baseDelay + _baseDelay * Math.Pow(_retries*0.2, 2) * 10;
-        return (int)(delay);
+        return (int)delay;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (await _timer.WaitForNextTickAsync() && !stoppingToken.IsCancellationRequested)
+        while (await _timer.WaitForNextTickAsync(stoppingToken))
         {
             var delay = await Action();
 

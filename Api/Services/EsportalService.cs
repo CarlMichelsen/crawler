@@ -4,17 +4,17 @@ namespace Services;
 
 public class EsportalService : BackgroundService
 {
-    private EsportalCrawler _crawler;
+    private readonly EsportalCrawler _crawler;
     private double _retries;
-    private double _baseDelay;
+    private readonly double _baseDelay;
     private double _currentDelay;
     
     private PeriodicTimer _timer;
     
 
-    public EsportalService()
+    public EsportalService(EsportalCrawler crawler)
     {
-        _crawler = new();
+        _crawler = crawler;
         _retries = 0;
         _baseDelay = 2500;
         _currentDelay = _baseDelay;
@@ -23,7 +23,7 @@ public class EsportalService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (await _timer.WaitForNextTickAsync() && !stoppingToken.IsCancellationRequested)
+        while (await _timer.WaitForNextTickAsync(stoppingToken))
         {
             var delay = await Action();
 
@@ -42,8 +42,7 @@ public class EsportalService : BackgroundService
         if (_retries>100) throw new Exception("Too many retries.");
 
         var item = await _crawler.Next();
-        
-        var success = await _crawler.Act(item);
+        var success = await _crawler.Act(item?.User.Id);
 
         if (success)
         {
