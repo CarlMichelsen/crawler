@@ -6,10 +6,10 @@ namespace Database.Repositories;
 
 public static class SearchRepository
 {
-    public static async Task<List<ProfileEntity>> NameSearch(string search, DataContext db)
+    public static async Task<List<ProfileEntity>> NameSearch(DataContext context, string search)
     {
-        if (db.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
-        var searchResult = from b in db.ProfileEntity where b.Username.ToLower().StartsWith(search.ToLower()) select b;
+        if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
+        var searchResult = from b in context.ProfileEntity where b.Username.ToLower().StartsWith(search.ToLower()) select b;
         var searchResultList = await searchResult
             .OrderBy(opt => opt.Username.Length-search.Length)
             .Take(10)
@@ -21,16 +21,16 @@ public static class SearchRepository
         return searchResultList;
     }
 
-    public static async Task<List<ProfileEntity>> FilterSearch(SearchFilter search, DataContext db)
+    public static async Task<List<ProfileEntity>> FilterSearch(DataContext context, SearchFilter search, bool unlimited = false)
     {
-        if (db.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
-        var clampedAmount = Math.Clamp(search.Amount, 0, 1000);
+        if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
+        var clampedAmount = unlimited ? int.MaxValue : Math.Clamp(search.Amount, 0, 1000);
         var max = search?.Elo?.Max is not null ? search?.Elo?.Max : null;
         var min = search?.Elo?.Min is not null ? search?.Elo?.Min : null;
         var minFriends = search?.MinimumFriendAmount is not null ? search?.MinimumFriendAmount : null;
         var username = search?.Username is not null ? search.Username.ToLower() : null;
 
-        return await db.ProfileEntity
+        return await context.ProfileEntity
             .Include(opt => opt.RecentStats)
             .Include(opt => opt.Stats)
             .Include(opt => opt.OldUsernames)
@@ -44,5 +44,16 @@ public static class SearchRepository
             .OrderByDescending(pro => username == null ? pro.Friends.Count : 0)
             .Take(clampedAmount)
             .ToListAsync();
+    }
+
+    public static async Task<int> EloCountSearch(DataContext context, SearchRange range)
+    {
+        if (range.Max is null) throw new NullReferenceException("No max value in range search");
+        if (range.Min is null) throw new NullReferenceException("No min value in range search");
+        if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
+        return await context.ProfileEntity
+            .Include(p => p.Stats)
+            .Where(p => p.Stats.Elo > range.Min && p.Stats.Elo < range.Max)
+            .CountAsync();
     }
 }

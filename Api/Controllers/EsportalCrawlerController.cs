@@ -9,14 +9,14 @@ namespace Api.Controllers;
 [Route("[controller]")]
 public class EsportalCrawlerController : ControllerBase
 {
+    private readonly ILogger<EsportalCrawlerController> _logger;
     private readonly DataContext _context;
 
-    public EsportalCrawlerController(DataContext context)
+    public EsportalCrawlerController(ILogger<EsportalCrawlerController> logger, DataContext context)
     {
+        _logger = logger;
         _context = context;
     }
-
-    private static void Log(string input) => Console.WriteLine($"[Crawler] {input}");
 
     [HttpGet("Status")]
     public async Task<ServiceResponse<string>> GetStatus()
@@ -32,7 +32,7 @@ public class EsportalCrawlerController : ControllerBase
         };
 
         res.Data = statusResponse.ToString();
-        Log($"Status: {res.Data}");
+        _logger.LogInformation("Status: {status}", res.Data);
         return res;
     }
 }
