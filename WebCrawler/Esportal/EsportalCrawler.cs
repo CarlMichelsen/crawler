@@ -86,16 +86,26 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
     private async Task HandleFatalError(ulong userId, string errorMessage)
     {
         var unk = await UnknownRepository.GetUnknownByUserId(_context, userId);
+        var profile = await ProfileRepository.GetProfileById(_context, userId);
 
-        var addedFailedUnknownSuccessfully = await FailedUnknownRepository.AddFailedUnknown(
-            _context,
-            new FailedUnknownEntity{
-                UserId = userId,
-                ErrorMessage = errorMessage,
-                Recorded = DateTime.Now
-            }
-        );
-        if (!addedFailedUnknownSuccessfully) throw new Exception("Failed to addFailedUnknown.");
+        if (profile is null)
+        {
+            var addedFailedUnknownSuccessfully = await FailedUnknownRepository.AddFailedUnknown(
+                _context,
+                new FailedUnknownEntity{
+                    UserId = userId,
+                    ErrorMessage = errorMessage,
+                    Recorded = DateTime.Now
+                }
+            );
+            if (!addedFailedUnknownSuccessfully) throw new Exception("Failed to addFailedUnknown.");
+        }
+        else
+        {
+            var success = await ProfileRepository.SetRecordedDate(_context, profile.Id, DateTime.Now);
+            if (!success) throw new Exception($"Failed to reset Recorded date on failed refresh of a ProfileEntity <{profile.Id}>");
+        }
+        
 
         var unknownId = unk?.Id;
         if (unknownId is not null)

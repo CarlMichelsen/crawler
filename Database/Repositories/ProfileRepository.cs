@@ -138,4 +138,17 @@ public static class ProfileRepository
         Console.WriteLine($"Outdated recorded at: {outdated?.Recorded.ToShortDateString()}");
         return outdated;
     }
+
+    public static async Task<bool> SetRecordedDate(DataContext context, ulong userId, DateTime dateTime)
+    {
+        if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
+        var profile = context.ProfileEntity.FirstOrDefault(p => p.Id == userId);
+        if (profile is not null)
+        {
+            profile.Recorded = dateTime;
+            await context.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
 }
