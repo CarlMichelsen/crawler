@@ -23,8 +23,8 @@ builder.Services
 
 builder.Services.AddDbContext<DataContext>();
 
-builder.Services.AddHostedService<EsportalService>();
-builder.Services.AddHostedService<EsportalSteamIdService>();
+//builder.Services.AddHostedService<EsportalService>();
+//builder.Services.AddHostedService<EsportalSteamIdService>();
 
 builder.Services.AddHttpClient<EsportalService>();
 

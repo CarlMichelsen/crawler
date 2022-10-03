@@ -46,7 +46,7 @@ public static class SearchRepository
             .ToListAsync();
     }
 
-    public static async Task<int> EloCountSearch(DataContext context, SearchRange range)
+    public static async Task<int> EloCountSearch(DataContext context, SearchRange range, bool includeDoubleZeroElo = false)
     {
         if (range.Max is null) throw new NullReferenceException("No max value in range search");
         if (range.Min is null) throw new NullReferenceException("No min value in range search");
@@ -54,6 +54,7 @@ public static class SearchRepository
         return await context.ProfileEntity
             .Include(p => p.Stats)
             .Where(p => p.Stats.Elo >= range.Min && p.Stats.Elo <= range.Max)
+            .Where(p => !includeDoubleZeroElo || (p.Stats.Elo % 100) != 0)
             .CountAsync();
     }
 }
