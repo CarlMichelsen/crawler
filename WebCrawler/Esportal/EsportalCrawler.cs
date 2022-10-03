@@ -67,7 +67,12 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
                 _logger.LogWarning("Assumed transient HttpRequestException: {message}", e.Message);
                 return false;
             }
-            throw new Exception("Fatal httpResponse.");
+            else
+            {
+                // this is a fatal error
+                _logger.LogCritical("Assumed fatal error: {message}", e?.Message ?? string.Empty);
+                await HandleFatalError((ulong)userId, e?.Message ?? string.Empty);
+            }
         }
         catch (Exception e)
         {
