@@ -2,28 +2,39 @@ using Database;
 using Database.Entities;
 using Database.Repositories;
 using WebCrawler.Esportal.Services;
+using Microsoft.Extensions.Logging;
 
 namespace WebCrawler.Esportal;
 
 public class EsportalCrawler : ICrawler<UnknownEntity>
 {
+    private readonly ILogger<EsportalCrawler> _logger;
     private readonly EsportalProfileService _profileService;
     private readonly DataContext _context;
 
-    public EsportalCrawler(EsportalProfileService profileService, DataContext context)
+    public EsportalCrawler(ILogger<EsportalCrawler> logger, EsportalProfileService profileService)
     {
+        _logger = logger;
         _profileService = profileService;
-        _context = context;
+        _context = new DataContext();
     }
 
     public async Task<UnknownEntity?> Next()
     {
         var unknown = await UnknownRepository.GetNextUnknown(_context);
-        if (unknown is not null) return unknown;
+        if (unknown is not null)
+        {
+            _logger.LogInformation("Found new account {username}", unknown.User.Username);
+            return unknown;
+        }
 
         var outdatedProfile = await ProfileRepository.GetNextOutDated(_context, TimeSpan.FromDays(14));
         var outdatedUser = await UserRepository.GetUserById(_context, outdatedProfile?.Id);
-        if (outdatedUser is not null) return new UnknownEntity{ User = outdatedUser, Recorded = DateTime.Now };
+        if (outdatedUser is not null)
+        {
+            _logger.LogInformation("Updating exsisting user {username}", outdatedUser.Username);
+            return new UnknownEntity{ User = outdatedUser, Recorded = DateTime.Now };
+        }
 
         return null;
     }
@@ -32,16 +43,20 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
     {
         if (userId is null) return false;
         var exsisting = await ProfileRepository.GetProfileById(_context, userId);
+        if (exsisting != null) Console.WriteLine($"Found exsisting \"{exsisting}\"");
 
         try
         {
-            if (exsisting is null)
+            if (exsisting == null)
             {
-                return await HandleNew((ulong)userId);
+                var handled = await HandleNew((ulong)userId);
+                if (handled) return await HandleComplete((ulong)userId);
             }
             else
             {
-                return await HandleExsisting(exsisting);
+                var handled = await HandleExsisting(exsisting);
+                if (handled) return await HandleComplete((ulong)userId);
+                //throw new NotImplementedException("Can't handle exsisting yet");
             }
         }
         catch (HttpRequestException e)
@@ -56,7 +71,7 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
             Console.WriteLine($"Assumed fatal error: ${e.Message}");
             await HandleFatalError((ulong)userId, e.Message);
         }
-        return true;
+        return false;
     }
 
     private async Task HandleFatalError(ulong userId, string errorMessage)
@@ -91,8 +106,6 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
 
         if (successfulParse && profile is not null)
         {
-            profile.Recorded = DateTime.Now;
-            Console.WriteLine(profile.ToString()+" --- NEW");
             return await ProfileRepository.AddProfileTransaction(_context, profile);
         }
 
@@ -106,11 +119,29 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
 
         if (successfulParse && updatedProfile is not null)
         {
-            updatedProfile.Recorded = DateTime.Now;
-            Console.WriteLine(updatedProfile.ToString()+" --- UPDATED");
-            return await ProfileRepository.UpdateProfileTransaction(_context, updatedProfile);
+            return await ProfileRepository.UpdateProfileTransaction(_context, updatedProfile);;
         }
 
         return false;
+    }
+
+    private async Task<bool> HandleComplete(ulong userId)
+    {
+        var unk = await UnknownRepository.GetUnknownByUserId(_context, userId);
+        if (unk is not null)
+        {
+            var success = await UnknownRepository.RemoveUnknown(_context, (ulong)unk.Id);;
+            if (success)
+            {
+                var profile = await ProfileRepository.GetProfileById(_context, userId);
+                _logger.LogInformation("Completed cleanup after fetching {username}", profile?.Username);
+            }
+            else
+            {
+                _logger.LogCritical("Failed to cleanup after fetching userid <{userId}>", userId);
+            }
+            return success;
+        }
+        return true; // if there is no unknown to remove (in case it was an update and not a discovery) return true
     }
 }

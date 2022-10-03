@@ -17,10 +17,11 @@ builder.Configuration
 
 // Dependency Injection
 builder.Services
-    .AddTransient<DataContext>()
     .AddTransient<EsportalCrawler>()
     .AddTransient<EsportalSteamIdCrawler>()
     .AddTransient<EsportalProfileService>();
+
+builder.Services.AddDbContext<DataContext>();
 
 builder.Services.AddHostedService<EsportalService>();
 builder.Services.AddHostedService<EsportalSteamIdService>();

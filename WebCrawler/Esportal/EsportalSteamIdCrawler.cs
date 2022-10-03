@@ -2,25 +2,27 @@ using System.Text.Json;
 using Database;
 using Database.Entities;
 using Database.Repositories;
+using Microsoft.Extensions.Logging;
 using WebCrawler.Esportal.Model;
 
 namespace WebCrawler.Esportal;
 
 public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
 {
+    private readonly ILogger<EsportalSteamIdCrawler> _logger;
     private readonly DataContext _context;
     
-    public EsportalSteamIdCrawler()
+    public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger)
     {
+        _logger = logger;
         _context = new DataContext();
     }
 
     public async Task<ProfileEntity?> Next()
     {
         if (_context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
-        Console.WriteLine("Attempting to get next SteamIdProfileEntity");
         var next = await EsportalSteamIdRepository.GetNextSteamIdCandidate(_context);
-        Console.WriteLine($"Found {next?.Username ?? string.Empty}");
+        _logger.LogInformation("Attempting to fetch steamid for {username}", next?.Username ?? string.Empty);
         return next;
     }
 
@@ -39,14 +41,14 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         {
             var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, responseDto.SteamId);
             var actionString = success  ? "Saved" : "Failed to save";
-            Console.WriteLine($"{actionString} {responseDto.SteamId} as steamid for {input.Username}");
+            _logger.LogInformation("{actionString} {SteamId} as steamid for {Username}", actionString, responseDto.SteamId, input.Username);
             return success;
         }
         else if (responseDto?.TransientError == false)
         {
             var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
             var actionString = success  ? "Saved" : "Failed to save";
-            Console.WriteLine($"{actionString} {responseDto.SteamId} as steamid for {input.Username}");
+            _logger.LogInformation("{actionString} {SteamId} as steamid for {Username}", actionString, responseDto.SteamId, input.Username);
             return success;
         }
         return false;
@@ -57,15 +59,17 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         return new HttpClient();
     }
 
-    private static async Task<string> RequestSteamId(Uri uri)
+    private async Task<string> RequestSteamId(Uri uri)
     {
         try
         {
-            var req = new HttpRequestMessage();
-            req.RequestUri = uri;
-            req.Method = HttpMethod.Get;
+            var req = new HttpRequestMessage
+            {
+                RequestUri = uri,
+                Method = HttpMethod.Get
+            };
 
-            Console.WriteLine(req.RequestUri);
+            _logger.LogInformation("Fetching SteamId64 from {uri}", req.RequestUri);
 
             var client = HttpClientFactory();
             var res = await client.SendAsync(req);
@@ -83,7 +87,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         }
     }
 
-    private static bool TrySerializeSteamIdDto(string input, out SteamIdDto? profile)
+    private bool TrySerializeSteamIdDto(string input, out SteamIdDto? profile)
     {
         SteamIdDto? temp = null;
         try
@@ -93,7 +97,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            _logger.LogError("Exception \"{message}\"", e.Message);
         }
         finally
         {

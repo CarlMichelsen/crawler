@@ -9,18 +9,14 @@ public static class UnknownRepository
     {
         try
         {
-            using (var dbContextTransaction = context.Database.BeginTransaction())
-            {
-                if (context.UnknownEntity is null) throw new NullReferenceException("datacontext UnknownEntity is null");
-                
-                var unknown = await context.UnknownEntity
-                    .FirstOrDefaultAsync((unk) => unk.Id == unknownId);
+            if (context.UnknownEntity is null) throw new NullReferenceException("datacontext UnknownEntity is null");
+            
+            var unknown = await context.UnknownEntity
+                .FirstOrDefaultAsync((unk) => unk.Id == unknownId);
 
-                if (unknown is not null) context.UnknownEntity.Remove(unknown);
+            if (unknown is not null) context.UnknownEntity.Remove(unknown);
 
-                context.SaveChanges();
-                await dbContextTransaction.CommitAsync();
-            }
+            await context.SaveChangesAsync();
             return true;
         }
         catch (Exception e)

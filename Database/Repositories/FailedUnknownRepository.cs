@@ -9,17 +9,13 @@ public static class FailedUnknownRepository
     {
         try
         {
-            using (var dbContextTransaction = context.Database.BeginTransaction())
-            {
-                if (context.FailedUnknownEntity is null) throw new NullReferenceException("Datacontext FailedUnknownEntity is null.");
-                var exists = await context.FailedUnknownEntity.AnyAsync((f) => f.UserId == failedUnknown.UserId);
-                if (exists) return false;
-                await context.FailedUnknownEntity.AddAsync(failedUnknown);
+            if (context.FailedUnknownEntity is null) throw new NullReferenceException("Datacontext FailedUnknownEntity is null.");
+            var exists = await context.FailedUnknownEntity.AnyAsync((f) => f.UserId == failedUnknown.UserId);
+            if (exists) return false;
+            await context.FailedUnknownEntity.AddAsync(failedUnknown);
 
-                // save and exit
-                context.SaveChanges();
-                await dbContextTransaction.CommitAsync();
-            }
+            // save and exit
+            await context.SaveChangesAsync();
             return true;
         }
         catch (System.Exception e)

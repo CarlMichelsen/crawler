@@ -13,50 +13,48 @@ public static class ProfileRepository
 
         try
         {
-            using (var dbContextTransaction = context.Database.BeginTransaction())
+            // handle friends separately
+            var allFriends = new List<UserEntity>(profile.Friends);
+            var exsistingFriends = new List<UserEntity>();
+            var newFriends = new List<UserEntity>();
+            profile.Friends = new List<UserEntity>();
+
+            foreach (var f in allFriends)
             {
-                var allFriends = new List<UserEntity>(profile.Friends);
-                var exsistingFriends = new List<UserEntity>();
-                profile.Friends = new List<UserEntity>();
-
-                foreach (var f in allFriends)
-                {
-                    var exsisting = context.UserEntity.Where(e => e.Id == f.Id).FirstOrDefault();
-                    if (exsisting is not null) exsistingFriends.Add(exsisting);
-                }
-                var newFriends = allFriends.Where(a => context.UserEntity.FirstOrDefault(e => e.Id == a.Id) == null);
-
-                // add ProfileEntity to db
-                profile.Recorded = DateTime.Now;
-                context.ProfileEntity.Add(profile);
-
-                // add new friends
-                if (newFriends.Any())
-                {
-                    context.UserEntity.AddRange(newFriends);
-                    var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
-                    context.UnknownEntity.AddRange(unknownEntities);
-                }
-
-                // update exsisting friends
-                if (exsistingFriends.Any())
-                {
-                    context.UserEntity.UpdateRange(exsistingFriends);
-                }
-                
-                context.SaveChanges();
-                await dbContextTransaction.CommitAsync();
+                var exsisting = await context.UserEntity.Where(e => e.Id == f.Id).FirstOrDefaultAsync();
+                if (exsisting is not null) exsistingFriends.Add(exsisting);
+                else if (exsisting is null) newFriends.Add(f);
             }
+
+            // add ProfileEntity to db
+            profile.Recorded = DateTime.Now;
+            context.ProfileEntity.Add(profile);
+
+            // add new friends
+            if (newFriends.Any())
+            {
+                context.UserEntity.AddRange(newFriends);
+                var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
+                context.UnknownEntity.AddRange(unknownEntities);
+            }
+
+            // update exsisting friends
+            if (exsistingFriends.Any())
+            {
+                context.UserEntity.UpdateRange(exsistingFriends);
+            }
+            
+            await context.SaveChangesAsync();
             return true;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine($"AddProfileTransaction -> {e.Message}");
             return false;
         }
     }
 
-    public static async Task<bool> UpdateProfileTransaction(DataContext context, ProfileEntity profile)
+    public static async Task<bool> UpdateProfileTransaction(DataContext context, ProfileEntity profileInput)
     {
         if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
         if (context.UserEntity is null) throw new NullReferenceException("UserEntity datacontext is null");
@@ -64,40 +62,47 @@ public static class ProfileRepository
 
         try
         {
-            using (var dbContextTransaction = context.Database.BeginTransaction())
+            var profile = await context.ProfileEntity
+                .Include(p => p.ProfileConnections)
+                .Include(p => p.Stats)
+                .Include(p => p.RecentStats)
+                .Include(p => p.Friends)
+                .Include(p => p.OldUsernames)
+                .FirstOrDefaultAsync(p => p.Id == profileInput.Id);
+
+            var oldDate = profile?.Recorded;
+            if (profile is null) throw new Exception("Could not find \"exsisting\" profile entity in database.");
+            context.ProfileEntity.Attach(profile);
+            profile.Recorded = DateTime.Now;
+
+            // handle friends separately
+            var allFriends = new List<UserEntity>(profile.Friends);
+            var exsistingFriends = new List<UserEntity>();
+            var newFriends = new List<UserEntity>();
+            profile.Friends = new List<UserEntity>();
+
+            foreach (var f in allFriends)
             {
-                var allFriends = new List<UserEntity>(profile.Friends);
-                var exsistingFriends = new List<UserEntity>();
-                profile.Friends = new List<UserEntity>();
-
-                foreach (var f in allFriends)
-                {
-                    var exsisting = context.UserEntity.Where(e => e.Id == f.Id).FirstOrDefault();
-                    if (exsisting is not null) exsistingFriends.Add(exsisting);
-                }
-                var newFriends = allFriends.Where(a => context.UserEntity.FirstOrDefault(e => e.Id == a.Id) == null);
-
-                // add ProfileEntity to db
-                profile.Recorded = DateTime.Now;
-                context.ProfileEntity.Update(profile);
-
-                // add never seen before by system friends
-                if (newFriends.Any())
-                {
-                    context.UserEntity.AddRange(newFriends);
-                    var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
-                    context.UnknownEntity.AddRange(unknownEntities);
-                }
-
-                // update exsisting friends
-                if (exsistingFriends.Any())
-                {
-                    context.UserEntity.UpdateRange(exsistingFriends);
-                }
-                
-                context.SaveChanges();
-                await dbContextTransaction.CommitAsync();
+                var exsisting = await context.UserEntity.Where(e => e.Id == f.Id).FirstOrDefaultAsync();
+                if (exsisting is not null) exsistingFriends.Add(exsisting);
+                else if (exsisting is null) newFriends.Add(f);
             }
+
+            // add never seen before by system friends
+            if (newFriends.Any())
+            {
+                context.UserEntity.AddRange(newFriends);
+                var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
+                context.UnknownEntity.AddRange(unknownEntities);
+            }
+
+            // update exsisting friends
+            if (exsistingFriends.Any())
+            {
+                context.UserEntity.UpdateRange(exsistingFriends);
+            }
+            
+            await context.SaveChangesAsync();
             return true;
         }
         catch (Exception e)
