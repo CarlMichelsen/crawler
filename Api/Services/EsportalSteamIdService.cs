@@ -4,6 +4,7 @@ namespace Services;
 
 public class EsportalSteamIdService : BackgroundService
 {
+    private readonly ILogger<EsportalSteamIdService> _logger;
     private readonly EsportalSteamIdCrawler _crawler;
     private double _retries;
     private readonly double _baseDelay;
@@ -12,8 +13,9 @@ public class EsportalSteamIdService : BackgroundService
     private PeriodicTimer _timer;
     
 
-    public EsportalSteamIdService(EsportalSteamIdCrawler crawler)
+    public EsportalSteamIdService(ILogger<EsportalSteamIdService> logger, EsportalSteamIdCrawler crawler)
     {
+        _logger = logger;
         _crawler = crawler;
         _retries = 0;
         _baseDelay = 8000;
@@ -51,8 +53,8 @@ public class EsportalSteamIdService : BackgroundService
             if (delay != _currentDelay)
             {
                 _currentDelay = delay;
-                var secondsDelayText = $"set delay to {Math.Round(((double)delay)/1000*10)/10} seconds for EsportalSteamIdService.";
-                Console.WriteLine(secondsDelayText);
+                var seconds = Math.Round(((double)delay)/1000*10)/10;
+                _logger.LogWarning("Backing off for {seconds} seconds. At attempt number {attempt}", seconds, _retries);
                 _timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_currentDelay));
             }
         }

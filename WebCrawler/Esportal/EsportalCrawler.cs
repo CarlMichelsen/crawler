@@ -43,7 +43,7 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
     {
         if (userId is null) return false;
         var exsisting = await ProfileRepository.GetProfileById(_context, userId);
-        if (exsisting != null) Console.WriteLine($"Found exsisting \"{exsisting}\"");
+        if (exsisting != null) _logger.LogInformation("Found exsisting: {exsisting}", exsisting);
 
         try
         {
@@ -62,13 +62,13 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
         catch (HttpRequestException e)
         {
             // this is a transient error
-            Console.WriteLine($"Assumed transient HttpRequestException: ${e.Message}");
+            _logger.LogWarning("Assumed transient HttpRequestException: {message}", e.Message);
             return false;
         }
         catch (Exception e)
         {
             // this is a fatal error
-            Console.WriteLine($"Assumed fatal error: ${e.Message}");
+            _logger.LogCritical("Assumed fatal error: {message}", e.Message);
             await HandleFatalError((ulong)userId, e.Message);
         }
         return false;

@@ -132,7 +132,7 @@ public static class ProfileRepository
         var cutoff = DateTime.Now.Subtract(timeToLive);
         var outdated = await context.ProfileEntity
             .Where(p => p.Recorded.CompareTo(cutoff)<0)
-            .OrderByDescending(p => p.Recorded)
+            .OrderBy(p => p.Recorded)
             .FirstOrDefaultAsync();
         
         Console.WriteLine($"Outdated recorded at: {outdated?.Recorded.ToShortDateString()}");
