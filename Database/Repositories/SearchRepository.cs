@@ -53,7 +53,7 @@ public static class SearchRepository
         if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
         return await context.ProfileEntity
             .Include(p => p.Stats)
-            .Where(p => p.Stats.Elo > range.Min && p.Stats.Elo < range.Max)
+            .Where(p => p.Stats.Elo >= range.Min && p.Stats.Elo <= range.Max)
             .CountAsync();
     }
 }
