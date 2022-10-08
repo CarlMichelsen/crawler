@@ -16,7 +16,7 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
     {
         _logger = logger;
         _profileService = profileService;
-        _context = new DataContext();
+        _context = new DataContext(new DatabaseConfiguration()); // make sure backgroundservices get their own Datacontext
     }
 
     public async Task<UnknownEntity?> Next()

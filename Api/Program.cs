@@ -19,7 +19,8 @@ builder.Configuration
 builder.Services
     .AddTransient<EsportalCrawler>()
     .AddTransient<EsportalSteamIdCrawler>()
-    .AddTransient<EsportalProfileService>();
+    .AddTransient<EsportalProfileService>()
+    .AddTransient<DatabaseConfiguration>();
 
 builder.Services.AddDbContext<DataContext>();
 

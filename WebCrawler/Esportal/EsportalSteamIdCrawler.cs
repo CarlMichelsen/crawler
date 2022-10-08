@@ -15,7 +15,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
     public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger)
     {
         _logger = logger;
-        _context = new DataContext();
+        _context = new DataContext(new DatabaseConfiguration()); // make sure backgroundservices get their own Datacontext
     }
 
     public async Task<ProfileEntity?> Next()
@@ -39,14 +39,14 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         if (!successfulSerialization) return false;
         if (responseDto?.Success == true && responseDto?.SteamId is not null)
         {
-            var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, responseDto.SteamId);
+            var success = await EsportalSteamIdRepository.UpsertSteamId(_context, input.Id, responseDto.SteamId);
             var actionString = success  ? "Saved" : "Failed to save";
             _logger.LogInformation("{actionString} {SteamId} as steamid for {Username}", actionString, responseDto.SteamId, input.Username);
             return success;
         }
         else if (responseDto?.TransientError == false)
         {
-            var success = await EsportalSteamIdRepository.UpsertSteamId(input.Id, null);
+            var success = await EsportalSteamIdRepository.UpsertSteamId(_context, input.Id, null);
             var actionString = success  ? "Saved" : "Failed to save";
             _logger.LogInformation("{actionString} {SteamId} as steamid for {Username}", actionString, responseDto.SteamId, input.Username);
             return success;

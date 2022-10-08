@@ -5,9 +5,8 @@ namespace Database.Repositories;
 
 public static class EsportalSteamIdRepository
 {
-    private static async Task UpsertSteamIdTransaction(ulong userId, string? steamId)
+    private static async Task UpsertSteamIdTransaction(DataContext context, ulong userId, string? steamId)
     {
-        using var context = new DataContext();
         using var dbContextTransaction = context.Database.BeginTransaction();
         if (context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
         var profile = context.ProfileEntity
@@ -43,11 +42,11 @@ public static class EsportalSteamIdRepository
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<bool> UpsertSteamId(ulong userId, string? steamId)
+    public static async Task<bool> UpsertSteamId(DataContext context, ulong userId, string? steamId)
     {
         try
         {
-            await UpsertSteamIdTransaction(userId, steamId);
+            await UpsertSteamIdTransaction(context, userId, steamId);
         }
         catch (System.Exception)
         {
