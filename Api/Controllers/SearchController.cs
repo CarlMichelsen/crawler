@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Database.Repositories;
 using Database;
 using Api.Dto;
+using Services.Steam;
 using Database.Search;
+using Services.Steam.Model;
 
 namespace Api.Controllers;
 
@@ -12,11 +14,13 @@ public class SearchController : ControllerBase
 {
     private readonly ILogger<SearchController> _logger;
     private readonly DataContext _context;
+    private readonly ISteamService _steamService;
 
-    public SearchController(ILogger<SearchController> logger ,DataContext context)
+    public SearchController(ILogger<SearchController> logger ,DataContext context, ISteamService steamService)
     {
         _logger = logger;
         _context = context;
+        _steamService = steamService;
     }
 
     private static void Log(string input)
@@ -36,7 +40,7 @@ public class SearchController : ControllerBase
             _logger.LogInformation("Found {count} results from username search: \"{username}\"", resultList.Count, q);
             res.Data = dtoList;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Log(e.Message);
             res.Success = false;
@@ -57,7 +61,7 @@ public class SearchController : ControllerBase
             _logger.LogInformation("Found {count} results from filter search: \"{search}\"", resultList.Count, search);
             res.Data = dtoList;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Log(e.Message);
             res.Success = false;
@@ -77,7 +81,25 @@ public class SearchController : ControllerBase
             _logger.LogInformation("Found {count} results from count search: \"{search}\"", resultCount, range);
             res.Data = resultCount;
         }
-        catch (System.Exception e)
+        catch (Exception e)
+        {
+            Log(e.Message);
+            res.Success = false;
+            res.Error = "Search failed.";
+        }
+        return res;
+    }
+
+    [HttpGet("SteamUser/{steamId64}")]
+    public async Task<ServiceResponse<List<PlayerSummary>>> Steam([FromRoute] ulong steamId64)
+    {
+        var res = new ServiceResponse<List<PlayerSummary>>();
+        try
+        {
+            var steamResponse = await _steamService.UserCounterStrikeStats(steamId64);
+            res.Data = steamResponse?.Response?.Players ?? new List<PlayerSummary>();
+        }
+        catch (Exception e)
         {
             Log(e.Message);
             res.Success = false;

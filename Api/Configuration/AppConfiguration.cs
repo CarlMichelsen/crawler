@@ -1,19 +1,44 @@
 using Database;
 using WebCrawler.Esportal;
+using Services.Steam;
 
 namespace Api.Configuration;
 
-public class AppConfiguration : IDatabaseConfiguration, ISteamIdUrlConfiguration
+public class AppConfiguration:
+    IDatabaseConfiguration,
+    ISteamIdUrlConfiguration,
+    ISteamServiceConfiguration
 {
+    private readonly DevConfiguration _dev;
+
     public string DatabaseConnectionString { get; }
     public string EsportalSteamIdUrl { get; }
+    public string SteamWebApiKey { get; }
+    public string CounterStrikeAppId { get; }
 
-    public AppConfiguration()
+    public AppConfiguration(DevConfiguration dev)
     {
-        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-        DatabaseConnectionString = databaseUrl ?? "Server=localhost,1433\\SQLEXPRESS;Database=esportal;MultipleActiveResultSets=True;User Id=SA;Password=ThisIsATestDevelopmentPassword!123;";
+        _dev = dev;
 
-        var steamidUrl = Environment.GetEnvironmentVariable("STEAMID_SERVICE_URL");
-        EsportalSteamIdUrl = steamidUrl ?? "http://157.245.20.228:8080";
+        DatabaseConnectionString = AttemptLoad("DATABASE_URL", true);
+        EsportalSteamIdUrl = AttemptLoad("STEAMID_SERVICE_URL", true);
+        SteamWebApiKey = AttemptLoad("STEAMAPI_KEY", true);
+        CounterStrikeAppId = AttemptLoad("COUNTERSTRIKE_APPID", true);
+    }
+
+    private string AttemptLoad(string key, bool required = false)
+    {
+        var devExsists = _dev.Configuration.TryGetValue(key, out string? value);
+        var envValue = Environment.GetEnvironmentVariable(key);
+        if (envValue is not null && !devExsists) value = envValue;
+        if (value is not null)
+        {
+            return value;
+        }
+        else if (required)
+        {
+            throw new Exception($"Missing required configuration variable \"{key}\"");
+        }
+        return string.Empty;
     }
 }

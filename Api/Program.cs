@@ -3,6 +3,7 @@ using BackgroundServices;
 using WebCrawler.Esportal;
 using WebCrawler.Esportal.Services;
 using Api.Configuration;
+using Services.Steam;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,14 @@ builder.Services
     .AddTransient<EsportalCrawler>()
     .AddTransient<EsportalSteamIdCrawler>()
     .AddTransient<EsportalProfileService>()
+    .AddTransient<ISteamService, SteamService>();
+
+// config
+builder.Services // TODO: single source of truth
     .AddSingleton<IDatabaseConfiguration, AppConfiguration>()
-    .AddSingleton<ISteamIdUrlConfiguration, AppConfiguration>();
+    .AddSingleton<ISteamIdUrlConfiguration, AppConfiguration>()
+    .AddSingleton<ISteamServiceConfiguration, AppConfiguration>()
+    .AddSingleton<DevConfiguration>();
 
 builder.Services.AddDbContext<DataContext>();
 
@@ -30,6 +37,7 @@ builder.Services.AddHostedService<EsportalBackgroundService>();
 builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
+builder.Services.AddHttpClient<SteamService>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();
