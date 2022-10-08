@@ -1,5 +1,5 @@
 using Database;
-using Services;
+using BackgroundServices;
 using WebCrawler.Esportal;
 using WebCrawler.Esportal.Services;
 
@@ -23,10 +23,10 @@ builder.Services
 
 builder.Services.AddDbContext<DataContext>();
 
-builder.Services.AddHostedService<EsportalService>();
-builder.Services.AddHostedService<EsportalSteamIdService>();
+builder.Services.AddHostedService<EsportalBackgroundService>();
+builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
-builder.Services.AddHttpClient<EsportalService>();
+builder.Services.AddHttpClient<EsportalBackgroundService>();
 
 builder.Services.AddHealthChecks();
 var app = builder.Build();

@@ -1,10 +1,10 @@
 using WebCrawler.Esportal;
 
-namespace Services;
+namespace BackgroundServices;
 
-public class EsportalService : BackgroundService
+public class EsportalBackgroundService : BackgroundService
 {
-    private readonly ILogger<EsportalService> _logger;
+    private readonly ILogger<EsportalBackgroundService> _logger;
     private readonly EsportalCrawler _crawler;
     private double _retries;
     private readonly double _baseDelay;
@@ -13,7 +13,7 @@ public class EsportalService : BackgroundService
     private PeriodicTimer _timer;
     
 
-    public EsportalService(ILogger<EsportalService> logger, EsportalCrawler crawler)
+    public EsportalBackgroundService(ILogger<EsportalBackgroundService> logger, EsportalCrawler crawler)
     {
         _logger = logger;
         _crawler = crawler;
