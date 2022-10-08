@@ -6,9 +6,9 @@ namespace Database;
 
 public class DataContext : DbContext
 {
-    private readonly DatabaseConfiguration _config;
+    private readonly IDatabaseConfiguration _config;
 
-    public DataContext(DatabaseConfiguration config) : base()
+    public DataContext(IDatabaseConfiguration config) : base()
     {
         _config = config;
         if (Database.CanConnect()) Database.EnsureCreated();
@@ -16,7 +16,7 @@ public class DataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(_config.ConnectionString, (SqlServerDbContextOptionsBuilder builder) => {
+        optionsBuilder.UseSqlServer(_config.DatabaseConnectionString, (SqlServerDbContextOptionsBuilder builder) => {
             //builder.EnableRetryOnFailure();
         });
         optionsBuilder.EnableSensitiveDataLogging();

@@ -9,14 +9,16 @@ namespace WebCrawler.Esportal;
 public class EsportalCrawler : ICrawler<UnknownEntity>
 {
     private readonly ILogger<EsportalCrawler> _logger;
+    private readonly IDatabaseConfiguration _databaseConfiguration;
     private readonly EsportalProfileService _profileService;
     private readonly DataContext _context;
 
-    public EsportalCrawler(ILogger<EsportalCrawler> logger, EsportalProfileService profileService)
+    public EsportalCrawler(ILogger<EsportalCrawler> logger, IDatabaseConfiguration databaseConfiguration, EsportalProfileService profileService)
     {
         _logger = logger;
+        _databaseConfiguration = databaseConfiguration;
         _profileService = profileService;
-        _context = new DataContext(new DatabaseConfiguration()); // make sure backgroundservices get their own Datacontext
+        _context = new DataContext(_databaseConfiguration); // make sure backgroundservices get their own Datacontext
     }
 
     public async Task<UnknownEntity?> Next()

@@ -9,13 +9,17 @@ namespace WebCrawler.Esportal;
 
 public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
 {
+    private readonly IDatabaseConfiguration _databaseConfiguration;
     private readonly ILogger<EsportalSteamIdCrawler> _logger;
     private readonly DataContext _context;
+    private readonly ISteamIdUrlConfiguration _config;
     
-    public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger)
+    public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger, IDatabaseConfiguration databaseConfiguration, ISteamIdUrlConfiguration config)
     {
         _logger = logger;
-        _context = new DataContext(new DatabaseConfiguration()); // make sure backgroundservices get their own Datacontext
+        _databaseConfiguration = databaseConfiguration;
+        _context = new DataContext(_databaseConfiguration); // make sure backgroundservices get their own Datacontext
+        _config = config;
     }
 
     public async Task<ProfileEntity?> Next()
@@ -32,8 +36,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         var input = await ProfileRepository.GetProfileById(_context, userId);
         if (input is null) return false;
         if (_context.ProfileConnectionEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
-        var steamIdServiceUrl = Environment.GetEnvironmentVariable("STEAMID_SERVICE_URL") ?? "http://157.245.20.228:8080";
-        var requestUri = new Uri($"{steamIdServiceUrl}/esportal-steamid/{input.Username}");
+        var requestUri = new Uri($"{_config.EsportalSteamIdUrl}/esportal-steamid/{input.Username}");
         var rawResponse = await RequestSteamId(requestUri);
         var successfulSerialization = TrySerializeSteamIdDto(rawResponse, out SteamIdDto? responseDto);
         if (!successfulSerialization) return false;

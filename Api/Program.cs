@@ -2,6 +2,7 @@ using Database;
 using BackgroundServices;
 using WebCrawler.Esportal;
 using WebCrawler.Esportal.Services;
+using Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,8 @@ builder.Services
     .AddTransient<EsportalCrawler>()
     .AddTransient<EsportalSteamIdCrawler>()
     .AddTransient<EsportalProfileService>()
-    .AddTransient<DatabaseConfiguration>();
+    .AddSingleton<IDatabaseConfiguration, AppConfiguration>()
+    .AddSingleton<ISteamIdUrlConfiguration, AppConfiguration>();
 
 builder.Services.AddDbContext<DataContext>();
 
