@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Database.Repositories;
+using Database.Search;
 using Database;
+
 using Api.Dto;
 using Services.Steam;
-using Database.Search;
 using Services.Steam.Model;
+using Services.Faceit;
+using Services.Faceit.Model;
 
 namespace Api.Controllers;
 
@@ -15,17 +18,19 @@ public class SearchController : ControllerBase
     private readonly ILogger<SearchController> _logger;
     private readonly DataContext _context;
     private readonly ISteamService _steamService;
+    private readonly IFaceitService _faceitService;
 
-    public SearchController(ILogger<SearchController> logger ,DataContext context, ISteamService steamService)
+    public SearchController(
+        ILogger<SearchController> logger,
+        DataContext context,
+        ISteamService steamService,
+        IFaceitService faceitService
+        )
     {
         _logger = logger;
         _context = context;
         _steamService = steamService;
-    }
-
-    private static void Log(string input)
-    {
-        Console.WriteLine($"[Search] {input}");
+        _faceitService = faceitService;
     }
 
     [HttpGet("Username/{q}")]
@@ -42,7 +47,7 @@ public class SearchController : ControllerBase
         }
         catch (Exception e)
         {
-            Log(e.Message);
+            _logger.LogInformation("Username search failed {}", e.Message);
             res.Success = false;
             res.Error = "Search failed.";
         }
@@ -63,7 +68,7 @@ public class SearchController : ControllerBase
         }
         catch (Exception e)
         {
-            Log(e.Message);
+            _logger.LogInformation("Filter search failed {}", e.Message);
             res.Success = false;
             res.Error = "Search failed.";
         }
@@ -83,7 +88,7 @@ public class SearchController : ControllerBase
         }
         catch (Exception e)
         {
-            Log(e.Message);
+            _logger.LogInformation("Count search failed {}", e.Message);
             res.Success = false;
             res.Error = "Search failed.";
         }
@@ -91,7 +96,7 @@ public class SearchController : ControllerBase
     }
 
     [HttpGet("SteamUser/{steamId64}")]
-    public async Task<ServiceResponse<List<PlayerSummary>>> Steam([FromRoute] ulong steamId64)
+    public async Task<ServiceResponse<List<PlayerSummary>>> Steam([FromRoute] long steamId64)
     {
         var res = new ServiceResponse<List<PlayerSummary>>();
         try
@@ -101,7 +106,25 @@ public class SearchController : ControllerBase
         }
         catch (Exception e)
         {
-            Log(e.Message);
+            _logger.LogInformation("Steam search failed {}", e.Message);
+            res.Success = false;
+            res.Error = "Search failed.";
+        }
+        return res;
+    }
+
+    [HttpGet("FaceitUser/{steamId64}")]
+    public async Task<ServiceResponse<FaceitPlayerResponse>> Faceit([FromRoute] long steamId64)
+    {
+        var res = new ServiceResponse<FaceitPlayerResponse>();
+        try
+        {
+            var faceitResponse = await _faceitService.FaceitPlayer(steamId64);
+            res.Data = faceitResponse;
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation("Steam search failed {}", e.Message);
             res.Success = false;
             res.Error = "Search failed.";
         }

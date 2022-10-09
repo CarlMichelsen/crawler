@@ -4,5 +4,5 @@ namespace Services.Steam;
 
 public interface ISteamService
 {
-    public Task<SteamResponse<PlayerSummaries>> UserCounterStrikeStats(ulong steamId64);
+    public Task<SteamResponse<PlayerSummaries>> UserCounterStrikeStats(long steamId64);
 }

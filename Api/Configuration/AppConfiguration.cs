@@ -1,13 +1,15 @@
 using Database;
 using WebCrawler.Esportal;
 using Services.Steam;
+using Services.Faceit;
 
 namespace Api.Configuration;
 
 public class AppConfiguration:
     IDatabaseConfiguration,
     ISteamIdUrlConfiguration,
-    ISteamServiceConfiguration
+    ISteamServiceConfiguration,
+    IFaceitConfiguration
 {
     private readonly DevConfiguration _dev;
 
@@ -15,6 +17,7 @@ public class AppConfiguration:
     public string EsportalSteamIdUrl { get; }
     public string SteamWebApiKey { get; }
     public string CounterStrikeAppId { get; }
+    public string FaceitApiKey { get; }
 
     public AppConfiguration(DevConfiguration dev)
     {
@@ -24,6 +27,7 @@ public class AppConfiguration:
         EsportalSteamIdUrl = AttemptLoad("STEAMID_SERVICE_URL", true);
         SteamWebApiKey = AttemptLoad("STEAMAPI_KEY", true);
         CounterStrikeAppId = AttemptLoad("COUNTERSTRIKE_APPID", true);
+        FaceitApiKey = AttemptLoad("FACEITAPI_KEY", true);
     }
 
     private string AttemptLoad(string key, bool required = false)

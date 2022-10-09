@@ -1,32 +1,34 @@
 using System.Text.Json;
-using Services.Steam.Model;
+using Services.Faceit.Model;
 
-namespace Services.Steam;
+namespace Services.Faceit;
 
-public class SteamService : BaseService,ISteamService
+public class FaceitService : BaseService,IFaceitService
 {
-    private readonly ISteamServiceConfiguration _config;
+    private readonly IFaceitConfiguration _config;
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
 
-    public SteamService(ISteamServiceConfiguration config, HttpClient httpClient)
+    public FaceitService(IFaceitConfiguration config, HttpClient httpClient)
     {
         _config = config;
         _httpClient = httpClient;
 
-        _baseUrl = "https://api.steampowered.com";
+        _baseUrl = "https://open.faceit.com";
     }
 
-    public async Task<SteamResponse<PlayerSummaries>> UserCounterStrikeStats(long steamId64)
+    public async Task<FaceitPlayerResponse> FaceitPlayer(long steamId64, string game = "csgo")
     {
         Dictionary<string, string> queryStringItems = new()
         {
-            { "key", _config.SteamWebApiKey },
-            { "steamids", steamId64.ToString() }
+            { "game", game },
+            { "game_player_id", steamId64.ToString() }
         };
 
-        var uri = new Uri($"{_baseUrl}/ISteamUser/GetPlayerSummaries/v2?{ToQueryString(queryStringItems)}");
+        var uri = new Uri($"{_baseUrl}/data/v4/players?{ToQueryString(queryStringItems)}");
         var req = new HttpRequestMessage(HttpMethod.Get, uri);
+        req.Headers.Add("Authorization", $"Bearer {_config.FaceitApiKey}");
+
         var res = await _httpClient.SendAsync(req);
         res.EnsureSuccessStatusCode();
 
@@ -34,10 +36,10 @@ public class SteamService : BaseService,ISteamService
         if (string.IsNullOrWhiteSpace(responseString)) 
             throw new Exception("responseString is empty");
         
-        var responseObject = JsonSerializer.Deserialize<SteamResponse<PlayerSummaries>>(responseString);
+        var responseObject = JsonSerializer.Deserialize<FaceitPlayerResponse>(responseString);
         if (responseObject is null)
             throw new NullReferenceException("responseObject is null");
- 
+        
         return responseObject;
     }
 }

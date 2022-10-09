@@ -135,7 +135,6 @@ public static class ProfileRepository
             .OrderBy(p => p.Recorded)
             .FirstOrDefaultAsync();
         
-        Console.WriteLine($"Outdated recorded at: {outdated?.Recorded.ToShortDateString()}");
         return outdated;
     }
 
