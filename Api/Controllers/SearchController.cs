@@ -101,6 +101,7 @@ public class SearchController : ControllerBase
         var res = new ServiceResponse<List<PlayerSummary>>();
         try
         {
+            _logger.LogInformation("Attempting to get steam csgo stats for {}", steamId64);
             var steamResponse = await _steamService.UserCounterStrikeStats(steamId64);
             res.Data = steamResponse?.Response?.Players ?? new List<PlayerSummary>();
         }
@@ -119,12 +120,13 @@ public class SearchController : ControllerBase
         var res = new ServiceResponse<FaceitPlayerResponse>();
         try
         {
+            _logger.LogInformation("Attempting to get faceit details for {}", steamId64);
             var faceitResponse = await _faceitService.FaceitPlayer(steamId64);
             res.Data = faceitResponse;
         }
         catch (Exception e)
         {
-            _logger.LogInformation("Steam search failed {}", e.Message);
+            _logger.LogInformation("Faceit search failed {}", e.Message);
             res.Success = false;
             res.Error = "Search failed.";
         }
