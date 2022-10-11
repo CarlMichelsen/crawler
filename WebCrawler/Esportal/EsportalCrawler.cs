@@ -52,13 +52,14 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
             if (exsisting == null)
             {
                 var handled = await HandleNew((ulong)userId);
-                if (handled) return await HandleComplete((ulong)userId);
+                if (!handled) await HandleFatalError((ulong)userId, "Failed to handle new.");
+                return await HandleComplete((ulong)userId);
             }
             else
             {
                 var handled = await HandleExsisting(exsisting);
-                if (handled) return await HandleComplete((ulong)userId);
-                //throw new NotImplementedException("Can't handle exsisting yet");
+                if (!handled) await HandleFatalError((ulong)userId, "Failed to handle exsisting.");
+                return await HandleComplete((ulong)userId);
             }
         }
         catch (HttpRequestException e)
