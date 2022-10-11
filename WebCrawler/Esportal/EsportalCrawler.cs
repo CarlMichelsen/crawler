@@ -68,14 +68,14 @@ public class EsportalCrawler : ICrawler<UnknownEntity>
                     await HandleFatalError((ulong)userId, "Failed to handle exsisting.");
                     return false;
                 }
-                
+
                 return await HandleComplete((ulong)userId);
             }
         }
         catch (HttpRequestException e)
         {
             // this is a transient error
-            if (e?.StatusCode != null && (int)e.StatusCode >= 500)
+            if (e?.StatusCode != null && ((int)e.StatusCode >= 500 || (int)e.StatusCode == 429))
             {
                 _logger.LogWarning("Assumed transient HttpRequestException: {message}", e.Message);
                 return false;
