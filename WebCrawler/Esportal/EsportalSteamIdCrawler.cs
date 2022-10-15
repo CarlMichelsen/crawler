@@ -12,9 +12,9 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
     private readonly IDatabaseConfiguration _databaseConfiguration;
     private readonly ILogger<EsportalSteamIdCrawler> _logger;
     private readonly DataContext _context;
-    private readonly ISteamIdUrlConfiguration _config;
+    private readonly ISteamIdConfiguration _config;
     
-    public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger, IDatabaseConfiguration databaseConfiguration, ISteamIdUrlConfiguration config)
+    public EsportalSteamIdCrawler(ILogger<EsportalSteamIdCrawler> logger, IDatabaseConfiguration databaseConfiguration, ISteamIdConfiguration config)
     {
         _logger = logger;
         _databaseConfiguration = databaseConfiguration;

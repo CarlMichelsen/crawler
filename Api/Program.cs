@@ -27,17 +27,17 @@ builder.Services
     .AddTransient<IFaceitService, FaceitService>();
 
 // config
-builder.Services // TODO: single source of truth
+builder.Services
+    .AddSingleton<IDevConfigurationReader, DevConfigurationReader>()
     .AddSingleton<IDatabaseConfiguration, AppConfiguration>()
-    .AddSingleton<ISteamIdUrlConfiguration, AppConfiguration>()
+    .AddSingleton<ISteamIdConfiguration, AppConfiguration>()
     .AddSingleton<ISteamServiceConfiguration, AppConfiguration>()
-    .AddSingleton<IFaceitConfiguration, AppConfiguration>()
-    .AddSingleton<DevConfiguration>();
+    .AddSingleton<IFaceitConfiguration, AppConfiguration>();
 
 builder.Services.AddDbContext<DataContext>();
 
 builder.Services.AddHostedService<EsportalBackgroundService>();
-builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
+//builder.Services.AddHostedService<EsportalSteamIdBackgroundService>(); // TODO: figure out why the service is broken :\
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
 builder.Services.AddHttpClient<SteamService>();

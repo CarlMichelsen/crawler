@@ -1,10 +1,10 @@
 namespace Api.Configuration;
 
-public class DevConfiguration
+public class DevConfigurationReader : IDevConfigurationReader
 {
-    public Dictionary<string, string?> Configuration { get; set; } = new Dictionary<string, string?>();
+    public Dictionary<string, string?> Configuration { get; } = new Dictionary<string, string?>();
 
-    public DevConfiguration()
+    public DevConfigurationReader()
     {
         AttemptLoadLocalConfigurationFile();
     }

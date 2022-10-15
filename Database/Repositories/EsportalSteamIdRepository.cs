@@ -54,4 +54,12 @@ public static class EsportalSteamIdRepository
         }
         return true;
     }
+
+    public static async Task<int> PurgeAllFailedSteamId(DataContext context)
+    {
+        if (context.ProfileConnectionEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
+        var toBeDeleted = await context.ProfileConnectionEntity.Where(c => c.SteamId64 == null).ToListAsync();
+        context.ProfileConnectionEntity.RemoveRange(toBeDeleted);
+        return await context.SaveChangesAsync();
+    }
 }

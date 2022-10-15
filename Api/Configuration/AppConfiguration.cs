@@ -6,12 +6,13 @@ using Services.Faceit;
 namespace Api.Configuration;
 
 public class AppConfiguration:
+    IAuthConfiguration,
     IDatabaseConfiguration,
-    ISteamIdUrlConfiguration,
+    ISteamIdConfiguration,
     ISteamServiceConfiguration,
     IFaceitConfiguration
 {
-    private readonly DevConfiguration _dev;
+    private readonly DevConfigurationReader _dev;
 
     public string DatabaseConnectionString { get; }
     public string EsportalSteamIdUrl { get; }
@@ -19,7 +20,7 @@ public class AppConfiguration:
     public string CounterStrikeAppId { get; }
     public string FaceitApiKey { get; }
 
-    public AppConfiguration(DevConfiguration dev)
+    public AppConfiguration(DevConfigurationReader dev)
     {
         _dev = dev;
 

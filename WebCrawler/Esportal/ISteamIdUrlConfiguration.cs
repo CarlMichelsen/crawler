@@ -1,6 +1,6 @@
 namespace WebCrawler.Esportal;
 
-public interface ISteamIdUrlConfiguration
+public interface ISteamIdConfiguration
 {
     public string EsportalSteamIdUrl { get; }
 }

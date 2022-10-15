@@ -19,9 +19,9 @@ public class EsportalCrawlerController : ControllerBase
     }
 
     [HttpGet("Status")]
-    public async Task<ServiceResponse<string>> GetStatus()
+    public async Task<ServiceResponse<CrawlerStatusDto>> GetStatus()
     {
-        var res = new ServiceResponse<string>();
+        var res = new ServiceResponse<CrawlerStatusDto>();
         var statusResponse = new CrawlerStatusDto
         {
             CrawlerName = "EsportalCrawler",
@@ -31,8 +31,25 @@ public class EsportalCrawlerController : ControllerBase
             SteamIdCount = await EsportalCrawlerStatusRepository.SteamIdCount(_context)
         };
 
-        res.Data = statusResponse.ToString();
+        res.Data = statusResponse;
         _logger.LogInformation("Status: {status}", res.Data);
+        return res;
+    }
+
+    [HttpPost("PurgeFailedSteamIdFetchList")]
+    public async Task<ServiceResponse<int>> PurgeFailedSteamIdFetchList()
+    {
+        var res = new ServiceResponse<int>();
+        try
+        {
+            res.Data = await EsportalSteamIdRepository.PurgeAllFailedSteamId(_context);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("PurgeAllFailedSteamId operation failed: {}", e.Message);
+            res.Success = false;
+            res.Error = "PurgeAllFailedSteamId operation failed.";
+        }
         return res;
     }
 }
