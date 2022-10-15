@@ -12,7 +12,7 @@ public class AppConfiguration:
     ISteamServiceConfiguration,
     IFaceitConfiguration
 {
-    private readonly DevConfigurationReader _dev;
+    private readonly IDevConfigurationReader _dev;
 
     public string DatabaseConnectionString { get; }
     public string EsportalSteamIdUrl { get; }
@@ -20,7 +20,7 @@ public class AppConfiguration:
     public string CounterStrikeAppId { get; }
     public string FaceitApiKey { get; }
 
-    public AppConfiguration(DevConfigurationReader dev)
+    public AppConfiguration(IDevConfigurationReader dev)
     {
         _dev = dev;
 
