@@ -29,8 +29,6 @@ public class AppConfiguration:
         SteamWebApiKey = AttemptLoad("STEAMAPI_KEY", true);
         CounterStrikeAppId = AttemptLoad("COUNTERSTRIKE_APPID", true);
         FaceitApiKey = AttemptLoad("FACEITAPI_KEY", true);
-
-        Console.WriteLine($"CONFIG\nDatabaseConnectionString='{DatabaseConnectionString}'\nEsportalSteamIdUrl='{EsportalSteamIdUrl}'\nSteamWebApiKey='{SteamWebApiKey}'\nCounterStrikeAppId='{CounterStrikeAppId}'\nFaceitApiKey='{FaceitApiKey}'");
     }
 
     private string AttemptLoad(string key, bool required = false)

@@ -46,7 +46,7 @@ public class EsportalCrawlerController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError("PurgeAllFailedSteamId operation failed: {}", e.Message);
+            _logger.LogError("PurgeAllFailedSteamId operation failed: {}\n{}", e.Message, e.InnerException);
             res.Success = false;
             res.Error = "PurgeAllFailedSteamId operation failed.";
         }
