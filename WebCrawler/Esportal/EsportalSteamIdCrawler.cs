@@ -36,7 +36,7 @@ public class EsportalSteamIdCrawler : ICrawler<ProfileEntity>
         var input = await ProfileRepository.GetProfileById(_context, userId);
         if (input is null) return false;
         if (_context.ProfileConnectionEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
-        var requestUri = new Uri($"{_config.EsportalSteamIdUrl}/esportal-steamid/{input.Username}");
+        var requestUri = new Uri($"{_config.EsportalSteamIdUrl}/{input.Username}");
         var rawResponse = await RequestSteamId(requestUri);
         var successfulSerialization = TrySerializeSteamIdDto(rawResponse, out SteamIdDto? responseDto);
         if (!successfulSerialization) return false;
