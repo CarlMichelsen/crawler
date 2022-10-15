@@ -57,7 +57,8 @@ public static class EsportalSteamIdRepository
 
     public static async Task<int> PurgeAllFailedSteamId(DataContext context)
     {
-        if (context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
+        if (context.ProfileEntity is null) throw new InvalidOperationException("Invalid ProfileEntity DataContext.");
+        if (context.ProfileConnectionEntity is null) throw new InvalidOperationException("Invalid ProfileConnectionEntity DataContext.");
         var removeProfileConnectionList = await context.ProfileEntity
             .Include(pro => pro.ProfileConnections)
             .Where(pro => pro.ProfileConnections != null && pro.ProfileConnections.SteamId64 == null)
@@ -68,6 +69,15 @@ public static class EsportalSteamIdRepository
             pro.ProfileConnections = null;
         }
 
-        return await context.SaveChangesAsync();
+        var purgeAmount = await context.SaveChangesAsync();
+
+        var toCleanUp = await context.ProfileConnectionEntity
+            .Where(c => c.SteamId64 == null)
+            .ToListAsync();
+        context.ProfileConnectionEntity.RemoveRange(toCleanUp);
+
+        await context.SaveChangesAsync();
+
+        return purgeAmount;
     }
 }

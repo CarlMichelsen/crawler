@@ -43,6 +43,7 @@ public class EsportalCrawlerController : ControllerBase
         try
         {
             res.Data = await EsportalSteamIdRepository.PurgeAllFailedSteamId(_context);
+            _logger.LogInformation("Purged {} failed steamid fetches", res.Data);
         }
         catch (Exception e)
         {
