@@ -72,7 +72,7 @@ public static class ApiMapper
         acc.Region = game.Region;
         acc.Country = src.Country;
         acc.Language = src.Settings.Language;
-        acc.FaceitUrl = src.FaceitUrl;
+        acc.FaceitUrl = src.FaceitUrl.Replace("{lang}", "en");
         acc.Friends = src.FriendsIds.Count;
 
         return acc;
