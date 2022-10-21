@@ -41,15 +41,17 @@ public static class ApiMapper
         if (src is null) return default;
         var summary = src.Response.Players.FirstOrDefault();
         if (summary is null) return default;
-        var acc = new SteamAccount();
-        acc.Username = summary.Personaname;
-        acc.RealName = summary.RealName;
-        acc.Avatar = summary.Avatar;
-        acc.AvatarMedium = summary.AvatarMedium;
-        acc.AvatarFull = summary.AvatarFull;
-        acc.AvatarHash = summary.AvatarHash;
-        acc.Country = summary.LocCountryCode;
-        acc.TimeCreated = summary.TimeCreated;
+        var acc = new SteamAccount
+        {
+            Username = summary.Personaname,
+            RealName = summary.RealName,
+            Avatar = summary.Avatar,
+            AvatarMedium = summary.AvatarMedium,
+            AvatarFull = summary.AvatarFull,
+            AvatarHash = summary.AvatarHash,
+            Country = summary.LocCountryCode,
+            TimeCreated = summary.TimeCreated
+        };
         return acc;
     }
 
