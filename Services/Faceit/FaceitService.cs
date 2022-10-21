@@ -3,7 +3,7 @@ using Services.Faceit.Model;
 
 namespace Services.Faceit;
 
-public class FaceitService : BaseService,IFaceitService
+public class FaceitService : BaseService, IFaceitService
 {
     private readonly IFaceitConfiguration _config;
     private readonly HttpClient _httpClient;
@@ -33,13 +33,13 @@ public class FaceitService : BaseService,IFaceitService
         res.EnsureSuccessStatusCode();
 
         var responseString = await res.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(responseString)) 
+        if (string.IsNullOrWhiteSpace(responseString))
             throw new Exception("responseString is empty");
-        
+
         var responseObject = JsonSerializer.Deserialize<FaceitPlayerResponse>(responseString);
         if (responseObject is null)
             throw new NullReferenceException("responseObject is null");
-        
+
         return responseObject;
     }
 }

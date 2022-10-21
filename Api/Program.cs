@@ -1,10 +1,11 @@
 using Database;
-using BackgroundServices;
+using Api.BackgroundServices;
 using WebCrawler.Esportal;
 using WebCrawler.Esportal.Services;
 using Api.Configuration;
 using Services.Steam;
 using Services.Faceit;
+using Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,20 +25,22 @@ builder.Services
     .AddTransient<EsportalSteamIdCrawler>()
     .AddTransient<EsportalProfileService>()
     .AddTransient<ISteamService, SteamService>()
-    .AddTransient<IFaceitService, FaceitService>();
+    .AddTransient<IFaceitService, FaceitService>()
+    .AddTransient<IQueryService, QueryService>()
+    .AddSingleton<IDevConfigurationReader, DevConfigurationReader>();
 
 // config
 builder.Services
-    .AddSingleton<IDevConfigurationReader, DevConfigurationReader>()
     .AddSingleton<IDatabaseConfiguration, AppConfiguration>()
     .AddSingleton<ISteamIdConfiguration, AppConfiguration>()
     .AddSingleton<ISteamServiceConfiguration, AppConfiguration>()
     .AddSingleton<IFaceitConfiguration, AppConfiguration>();
 
+
 builder.Services.AddDbContext<DataContext>();
 
-builder.Services.AddHostedService<EsportalBackgroundService>();
-builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
+//builder.Services.AddHostedService<EsportalBackgroundService>();
+//builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
 builder.Services.AddHttpClient<SteamService>();

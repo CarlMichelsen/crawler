@@ -3,7 +3,7 @@ using Services.Steam.Model;
 
 namespace Services.Steam;
 
-public class SteamService : BaseService,ISteamService
+public class SteamService : BaseService, ISteamService
 {
     private readonly ISteamServiceConfiguration _config;
     private readonly HttpClient _httpClient;
@@ -17,7 +17,7 @@ public class SteamService : BaseService,ISteamService
         _baseUrl = "https://api.steampowered.com";
     }
 
-    public async Task<SteamResponse<PlayerSummaries>> UserCounterStrikeStats(long steamId64)
+    public async Task<SteamResponse> UserCounterStrikeStats(long steamId64)
     {
         Dictionary<string, string> queryStringItems = new()
         {
@@ -31,13 +31,13 @@ public class SteamService : BaseService,ISteamService
         res.EnsureSuccessStatusCode();
 
         var responseString = await res.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(responseString)) 
+        if (string.IsNullOrWhiteSpace(responseString))
             throw new Exception("responseString is empty");
-        
-        var responseObject = JsonSerializer.Deserialize<SteamResponse<PlayerSummaries>>(responseString);
+
+        var responseObject = JsonSerializer.Deserialize<SteamResponse>(responseString);
         if (responseObject is null)
             throw new NullReferenceException("responseObject is null");
- 
+
         return responseObject;
     }
 }

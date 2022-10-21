@@ -11,11 +11,12 @@ public static class SearchRepository
         if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
         var searchResult = from b in context.ProfileEntity where b.Username.ToLower().StartsWith(search.ToLower()) select b;
         var searchResultList = await searchResult
-            .OrderBy(opt => opt.Username.Length-search.Length)
+            .OrderBy(opt => opt.Username.Length - search.Length)
             .Take(10)
             .Include(opt => opt.RecentStats)
             .Include(opt => opt.Stats)
             .Include(opt => opt.OldUsernames)
+            .Include(opt => opt.ProfileConnections)
             .Include(opt => opt.Friends)
             .ToListAsync();
         return searchResultList;
@@ -40,7 +41,7 @@ public static class SearchRepository
             .Where(pro => minFriends == null || pro.Friends.Count >= minFriends)
             .Where(pro => username == null || pro.Username.ToLower()
             .StartsWith(username))
-            .OrderBy(opt => username != null ? opt.Username.Length-username.Length : 0)
+            .OrderBy(opt => username != null ? opt.Username.Length - username.Length : 0)
             .OrderByDescending(pro => username == null ? pro.Friends.Count : 0)
             .Take(clampedAmount)
             .ToListAsync();

@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Services.Steam.Model;
 
-public class SteamResponse<T>
+public class SteamResponse
 {
     [JsonPropertyName("response")]
-    public T? Response { get; set; }
+    public PlayerSummaries Response { get; set; } = new PlayerSummaries();
 }

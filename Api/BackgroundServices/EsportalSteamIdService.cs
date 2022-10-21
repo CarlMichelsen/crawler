@@ -1,6 +1,6 @@
 using WebCrawler.Esportal;
 
-namespace BackgroundServices;
+namespace Api.BackgroundServices;
 
 public class EsportalSteamIdBackgroundService : BackgroundService
 {
@@ -9,9 +9,9 @@ public class EsportalSteamIdBackgroundService : BackgroundService
     private double _retries;
     private readonly double _baseDelay;
     private double _currentDelay;
-    
+
     private PeriodicTimer _timer;
-    
+
 
     public EsportalSteamIdBackgroundService(ILogger<EsportalSteamIdBackgroundService> logger, EsportalSteamIdCrawler crawler)
     {
@@ -25,7 +25,7 @@ public class EsportalSteamIdBackgroundService : BackgroundService
 
     private async Task<int> Action()
     {
-        if (_retries>100) throw new Exception("Too many retries.");
+        if (_retries > 100) throw new Exception("Too many retries.");
 
         var profileEntity = await _crawler.Next();
         var userId = profileEntity?.Id;
@@ -40,7 +40,7 @@ public class EsportalSteamIdBackgroundService : BackgroundService
             _retries++;
         }
 
-        var delay = _baseDelay + _baseDelay * Math.Pow(_retries*0.2, 2) * 10;
+        var delay = _baseDelay + _baseDelay * Math.Pow(_retries * 0.2, 2) * 10;
         return (int)delay;
     }
 
@@ -53,7 +53,7 @@ public class EsportalSteamIdBackgroundService : BackgroundService
             if (delay != _currentDelay)
             {
                 _currentDelay = delay;
-                var seconds = Math.Round(((double)delay)/1000*10)/10;
+                var seconds = Math.Round(((double)delay) / 1000 * 10) / 10;
                 _logger.LogWarning("Backing off for {seconds} seconds. At attempt number {attempt}", seconds, _retries);
                 _timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_currentDelay));
             }
