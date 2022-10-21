@@ -22,7 +22,7 @@ public class QueryService : IQueryService
         _faceitService = faceitService;
     }
 
-    public async Task<IEnumerable<QueryResponse>> Search(string query)
+    public async Task<IEnumerable<QueryResponse>> EsportalUsernameSearch(string query)
     {
         var results = new List<QueryResponse>();
 

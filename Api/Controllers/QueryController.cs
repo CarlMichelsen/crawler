@@ -20,14 +20,14 @@ public class QueryController : ControllerBase
         _query = query;
     }
 
-    [HttpGet("Username/{q}")]
-    public async Task<ServiceResponse<IEnumerable<QueryResponse>>> Username([FromRoute] string q)
+    [HttpGet("EsportalUsername/{q}")]
+    public async Task<ServiceResponse<IEnumerable<QueryResponse>>> EsportalUsername([FromRoute] string q)
     {
         var res = new ServiceResponse<IEnumerable<QueryResponse>>();
         try
         {
             _logger.LogInformation("Search: \"{}\"", q);
-            res.Data = await _query.Search(q);
+            res.Data = await _query.EsportalUsernameSearch(q);
         }
         catch (Exception e)
         {

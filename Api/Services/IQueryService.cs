@@ -4,5 +4,5 @@ namespace Api.Services;
 
 public interface IQueryService
 {
-    Task<IEnumerable<QueryResponse>> Search(string query);
+    Task<IEnumerable<QueryResponse>> EsportalUsernameSearch(string query);
 }
