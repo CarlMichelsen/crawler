@@ -30,14 +30,7 @@ public class QueryController : ControllerBase
         try
         {
             _logger.LogInformation("Search: \"{}\"", q);
-            res.Data = await _memoryCache.GetOrCreateAsync(
-                q,
-                entry =>
-                {
-                    entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));
-                    return _query.EsportalUsernameSearch(q);
-                }
-            );
+            res.Data = await _query.EsportalUsernameSearch(q);
         }
         catch (Exception e)
         {

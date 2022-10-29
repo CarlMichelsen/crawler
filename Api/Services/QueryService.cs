@@ -7,6 +7,7 @@ using Services.Steam.Model;
 using Services.Faceit.Model;
 using Api.Dto;
 using Database.Entities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Api.Services;
 
@@ -15,18 +16,31 @@ public class QueryService : IQueryService
     private readonly DataContext _context;
     private readonly ISteamService _steamService;
     private readonly IFaceitService _faceitService;
+    private readonly IMemoryCache _memoryCache;
 
-    public QueryService(DataContext context, ISteamService steamService, IFaceitService faceitService)
+    public QueryService(DataContext context, ISteamService steamService, IFaceitService faceitService, IMemoryCache memoryCache)
     {
         _context = context;
         _steamService = steamService;
         _faceitService = faceitService;
+        _memoryCache = memoryCache;
     }
 
     public async Task<IEnumerable<QueryResponse>> EsportalUsernameSearch(string query)
     {
+        return await _memoryCache.GetOrCreateAsync(
+                query,
+                entry =>
+                {
+                    entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));
+                    return NonCachedEsportalUsernameSearch(query);
+                }
+            );
+    }
+
+    private async Task<IEnumerable<QueryResponse>> NonCachedEsportalUsernameSearch(string query)
+    {
         var results = new List<QueryResponse>();
-        Console.WriteLine(query);
 
         var candidates = await SearchRepository.NameSearch(_context, query);
         var tasks = new List<Task<(ProfileEntity, SteamResponse?, FaceitPlayerResponse?)>>();
@@ -55,7 +69,6 @@ public class QueryService : IQueryService
 
     private async Task<(ProfileEntity, SteamResponse?, FaceitPlayerResponse?)> GetServiceData(ProfileEntity esportalProfile)
     {
-        System.Console.WriteLine($"Getting data for {esportalProfile.Username}");
         var steamId64String = esportalProfile.ProfileConnections?.SteamId64?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(steamId64String)) return (esportalProfile, null, null);
         long steamId64 = long.Parse(steamId64String);
