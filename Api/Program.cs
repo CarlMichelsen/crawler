@@ -6,7 +6,6 @@ using Api.Configuration;
 using Services.Steam;
 using Services.Faceit;
 using Api.Services;
-using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
