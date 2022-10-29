@@ -6,6 +6,7 @@ using Database.Repositories;
 using Services.Steam.Model;
 using Services.Faceit.Model;
 using Api.Dto;
+using Database.Entities;
 
 namespace Api.Services;
 
@@ -25,19 +26,19 @@ public class QueryService : IQueryService
     public async Task<IEnumerable<QueryResponse>> EsportalUsernameSearch(string query)
     {
         var results = new List<QueryResponse>();
+        Console.WriteLine(query);
 
         var candidates = await SearchRepository.NameSearch(_context, query);
-        foreach (var esportal in candidates)
-        {
-            SteamResponse? steamResponse = null;
-            FaceitPlayerResponse? faceitResponse = null;
+        var tasks = new List<Task<(ProfileEntity, SteamResponse?, FaceitPlayerResponse?)>>();
 
-            if (esportal.ProfileConnections?.SteamId64 is not null)
-            {
-                long steamId64 = long.Parse(esportal.ProfileConnections.SteamId64.Trim());
-                steamResponse = await AttemptGetSteamResponse(steamId64);
-                faceitResponse = await AttemptGetFaceitResponse(steamId64);
-            }
+        foreach (var esportal in candidates) tasks.Add(GetServiceData(esportal));
+        var serviceResponseList = await Task.WhenAll(tasks);
+
+        foreach (var response in serviceResponseList)
+        {
+            var esportal = response.Item1;
+            var steamResponse = response.Item2;
+            var faceitResponse = response.Item3;
 
             var q = new QueryResponse
             {
@@ -52,6 +53,19 @@ public class QueryService : IQueryService
         return results;
     }
 
+    private async Task<(ProfileEntity, SteamResponse?, FaceitPlayerResponse?)> GetServiceData(ProfileEntity esportalProfile)
+    {
+        System.Console.WriteLine($"Getting data for {esportalProfile.Username}");
+        var steamId64String = esportalProfile.ProfileConnections?.SteamId64?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(steamId64String)) return (esportalProfile, null, null);
+        long steamId64 = long.Parse(steamId64String);
+
+        var steamTask = AttemptGetSteamResponse(steamId64);
+        var faceitTask = AttemptGetFaceitResponse(steamId64);
+        var steamResponse = await steamTask;
+        var faceitResponse = await faceitTask;
+        return (esportalProfile, steamResponse, faceitResponse);
+    }
 
     private async Task<SteamResponse?> AttemptGetSteamResponse(long steamId64)
     {

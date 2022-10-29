@@ -28,7 +28,6 @@ builder.Services
     .AddTransient<ISteamService, SteamService>()
     .AddTransient<IFaceitService, FaceitService>()
     .AddTransient<IQueryService, QueryService>()
-    .AddTransient<IMemoryCache, MemoryCache>()
     .AddSingleton<IDevConfigurationReader, DevConfigurationReader>();
 
 // config
@@ -41,13 +40,14 @@ builder.Services
 
 builder.Services.AddDbContext<DataContext>();
 
-builder.Services.AddHostedService<EsportalBackgroundService>();
-builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
+//builder.Services.AddHostedService<EsportalBackgroundService>();
+//builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
 builder.Services.AddHttpClient<SteamService>();
 builder.Services.AddHttpClient<FaceitService>();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddHealthChecks();
 var app = builder.Build();
 

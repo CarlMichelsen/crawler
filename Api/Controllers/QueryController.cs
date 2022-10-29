@@ -31,7 +31,7 @@ public class QueryController : ControllerBase
         {
             _logger.LogInformation("Search: \"{}\"", q);
             res.Data = await _memoryCache.GetOrCreateAsync(
-                q.ToLower().Trim(),
+                q,
                 entry =>
                 {
                     entry.SetAbsoluteExpiration(TimeSpan.FromDays(1));
@@ -41,7 +41,7 @@ public class QueryController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogCritical("Search error: \"{}\"", e.Message);
+            _logger.LogCritical("Search error: \"{}\"", e.InnerException?.Message);
             res.Success = false;
             res.Error = "Search failed for some reason :'(";
         }
