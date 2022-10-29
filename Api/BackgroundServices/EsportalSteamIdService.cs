@@ -18,7 +18,7 @@ public class EsportalSteamIdBackgroundService : BackgroundService
         _logger = logger;
         _crawler = crawler;
         _retries = 0;
-        _baseDelay = 8000;
+        _baseDelay = 5000;
         _currentDelay = _baseDelay;
         _timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_baseDelay));
     }

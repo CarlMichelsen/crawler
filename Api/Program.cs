@@ -6,6 +6,7 @@ using Api.Configuration;
 using Services.Steam;
 using Services.Faceit;
 using Api.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services
     .AddTransient<ISteamService, SteamService>()
     .AddTransient<IFaceitService, FaceitService>()
     .AddTransient<IQueryService, QueryService>()
+    .AddTransient<IMemoryCache, MemoryCache>()
     .AddSingleton<IDevConfigurationReader, DevConfigurationReader>();
 
 // config
