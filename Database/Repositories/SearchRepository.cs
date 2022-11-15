@@ -19,6 +19,7 @@ public static class SearchRepository
             .Include(opt => opt.ProfileConnections)
             .Include(opt => opt.Friends)
             .ToListAsync();
+
         return searchResultList;
     }
 

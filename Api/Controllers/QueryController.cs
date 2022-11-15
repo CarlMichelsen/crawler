@@ -31,7 +31,7 @@ public class QueryController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogCritical("Search error: \"{}\"", e.InnerException?.Message);
+            _logger.LogCritical("Search error: \"{}\"", e.Message);
             res.Success = false;
             res.Error = "Search failed for some reason :'(";
         }

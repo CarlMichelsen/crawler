@@ -34,7 +34,7 @@ public static class ProfileRepository
             if (newFriends.Any())
             {
                 context.UserEntity.AddRange(newFriends);
-                var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
+                var unknownEntities = newFriends.Select(f => new UnknownEntity { User = f, Recorded = DateTime.Now });
                 context.UnknownEntity.AddRange(unknownEntities);
             }
 
@@ -43,7 +43,7 @@ public static class ProfileRepository
             {
                 context.UserEntity.UpdateRange(exsistingFriends);
             }
-            
+
             await context.SaveChangesAsync();
             return true;
         }
@@ -75,33 +75,9 @@ public static class ProfileRepository
             context.ProfileEntity.Attach(profile);
             profile.Recorded = DateTime.Now;
 
-            // handle friends separately
-            var allFriends = new List<UserEntity>(profile.Friends);
-            var exsistingFriends = new List<UserEntity>();
-            var newFriends = new List<UserEntity>();
-            profile.Friends = new List<UserEntity>();
+            var friendsInStringFormat = profile.Friends.Select(f => $"{f.Username}<{f.Id}>");
+            Console.WriteLine($"USER|{profile.Username}<{profile.Id}>| --> FRIENDS|{string.Join(",", friendsInStringFormat)}|");
 
-            foreach (var f in allFriends)
-            {
-                var exsisting = await context.UserEntity.Where(e => e.Id == f.Id).FirstOrDefaultAsync();
-                if (exsisting is not null) exsistingFriends.Add(exsisting);
-                else if (exsisting is null) newFriends.Add(f);
-            }
-
-            // add never seen before by system friends
-            if (newFriends.Any())
-            {
-                context.UserEntity.AddRange(newFriends);
-                var unknownEntities = newFriends.Select(f => new UnknownEntity{ User = f, Recorded = DateTime.Now });
-                context.UnknownEntity.AddRange(unknownEntities);
-            }
-
-            // update exsisting friends
-            if (exsistingFriends.Any())
-            {
-                context.UserEntity.UpdateRange(exsistingFriends);
-            }
-            
             await context.SaveChangesAsync();
             return true;
         }
@@ -131,10 +107,10 @@ public static class ProfileRepository
         if (context.ProfileEntity is null) throw new NullReferenceException("ProfileEntity datacontext is null");
         var cutoff = DateTime.Now.Subtract(timeToLive);
         var outdated = await context.ProfileEntity
-            .Where(p => p.Recorded.CompareTo(cutoff)<0)
+            .Where(p => p.Recorded.CompareTo(cutoff) < 0)
             .OrderBy(p => p.Recorded)
             .FirstOrDefaultAsync();
-        
+
         return outdated;
     }
 
