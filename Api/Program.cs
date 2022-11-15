@@ -47,7 +47,7 @@ builder.Services
 builder.Services.AddDbContext<DataContext>();
 
 builder.Services.AddHostedService<EsportalBackgroundService>();
-//builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
+builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
 builder.Services.AddHttpClient<SteamService>();
