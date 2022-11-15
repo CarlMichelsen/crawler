@@ -46,8 +46,8 @@ builder.Services
 
 builder.Services.AddDbContext<DataContext>();
 
-builder.Services.AddHostedService<EsportalBackgroundService>();
-//builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
+//builder.Services.AddHostedService<EsportalBackgroundService>(); THIS IS PERMANENTLY DISABLED
+builder.Services.AddHostedService<EsportalSteamIdBackgroundService>();
 
 builder.Services.AddHttpClient<EsportalBackgroundService>();
 builder.Services.AddHttpClient<SteamService>();
