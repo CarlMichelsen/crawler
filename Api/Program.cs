@@ -6,6 +6,7 @@ using Api.Configuration;
 using Services.Steam;
 using Services.Faceit;
 using Api.Services;
+using Api.Services.Cached;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,17 +25,23 @@ builder.Services
     .AddTransient<EsportalCrawler>()
     .AddTransient<EsportalSteamIdCrawler>()
     .AddTransient<EsportalProfileService>()
-    .AddTransient<ISteamService, SteamService>()
-    .AddTransient<IFaceitService, FaceitService>()
+    .AddTransient<ISteamService, CachedSteamService>()
+    .AddTransient<IFaceitService, CachedFaceitService>()
     .AddTransient<IQueryService, QueryService>()
     .AddSingleton<IDevConfigurationReader, DevConfigurationReader>();
+
+// Base services for cached versions
+builder.Services
+    .AddTransient<FaceitService>()
+    .AddTransient<SteamService>();
 
 // config
 builder.Services
     .AddSingleton<IDatabaseConfiguration, AppConfiguration>()
     .AddSingleton<ISteamIdConfiguration, AppConfiguration>()
     .AddSingleton<ISteamServiceConfiguration, AppConfiguration>()
-    .AddSingleton<IFaceitConfiguration, AppConfiguration>();
+    .AddSingleton<IFaceitConfiguration, AppConfiguration>()
+    .AddSingleton<ICrawlerConfiguration, AppConfiguration>();
 
 
 builder.Services.AddDbContext<DataContext>();

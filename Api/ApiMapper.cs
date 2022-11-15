@@ -15,7 +15,7 @@ public static class ApiMapper
     {
         get
         {
-            if (_mapper is null) _mapper = CreateMapperConfiguration().CreateMapper();
+            _mapper ??= CreateMapperConfiguration().CreateMapper();
             return _mapper;
         }
     }

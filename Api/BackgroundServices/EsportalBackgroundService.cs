@@ -1,9 +1,11 @@
+using Api.Configuration;
 using WebCrawler.Esportal;
 
 namespace Api.BackgroundServices;
 
 public class EsportalBackgroundService : BackgroundService
 {
+    private readonly ICrawlerConfiguration _config;
     private readonly ILogger<EsportalBackgroundService> _logger;
     private readonly EsportalCrawler _crawler;
     private double _retries;
@@ -13,8 +15,9 @@ public class EsportalBackgroundService : BackgroundService
     private PeriodicTimer _timer;
 
 
-    public EsportalBackgroundService(ILogger<EsportalBackgroundService> logger, EsportalCrawler crawler)
+    public EsportalBackgroundService(ICrawlerConfiguration config, ILogger<EsportalBackgroundService> logger, EsportalCrawler crawler)
     {
+        _config = config;
         _logger = logger;
         _crawler = crawler;
         _retries = 0;
@@ -25,6 +28,12 @@ public class EsportalBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (!_config.EnableCrawler)
+        {
+            _logger.LogInformation("EsportalBackgroundService is not enabled");
+            return;
+        }
+
         while (await _timer.WaitForNextTickAsync(stoppingToken))
         {
             var delay = await Action();

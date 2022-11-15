@@ -5,12 +5,12 @@ using Services.Faceit;
 
 namespace Api.Configuration;
 
-public class AppConfiguration:
-    IAuthConfiguration,
+public class AppConfiguration :
     IDatabaseConfiguration,
     ISteamIdConfiguration,
     ISteamServiceConfiguration,
-    IFaceitConfiguration
+    IFaceitConfiguration,
+    ICrawlerConfiguration
 {
     private readonly IDevConfigurationReader _dev;
 
@@ -19,6 +19,7 @@ public class AppConfiguration:
     public string SteamWebApiKey { get; }
     public string CounterStrikeAppId { get; }
     public string FaceitApiKey { get; }
+    public bool EnableCrawler { get; }
 
     public AppConfiguration(IDevConfigurationReader dev)
     {
@@ -29,6 +30,7 @@ public class AppConfiguration:
         SteamWebApiKey = AttemptLoad("STEAMAPI_KEY", true);
         CounterStrikeAppId = AttemptLoad("COUNTERSTRIKE_APPID", true);
         FaceitApiKey = AttemptLoad("FACEITAPI_KEY", true);
+        EnableCrawler = string.Equals(AttemptLoad("ENABLE_CRAWLER", false).ToLower(), "true");
     }
 
     private string AttemptLoad(string key, bool required = false)

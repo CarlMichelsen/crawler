@@ -1,4 +1,3 @@
-using Database;
 using Microsoft.AspNetCore.Mvc;
 
 using Api.Services;
@@ -12,15 +11,13 @@ namespace Api.Controllers;
 [Route("[controller]")]
 public class QueryController : ControllerBase
 {
-    private readonly IMemoryCache _memoryCache;
     private readonly ILogger<QueryController> _logger;
     private readonly IQueryService _query;
 
-    public QueryController(ILogger<QueryController> logger, IQueryService query, IMemoryCache memoryCache)
+    public QueryController(ILogger<QueryController> logger, IQueryService query)
     {
         _logger = logger;
         _query = query;
-        _memoryCache = memoryCache;
     }
 
     [HttpGet("EsportalUsername/{q}")]
@@ -31,6 +28,26 @@ public class QueryController : ControllerBase
         {
             _logger.LogInformation("Search: \"{}\"", q);
             res.Data = await _query.EsportalUsernameSearch(q);
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical("Search error: \"{}\"", e.InnerException?.Message);
+            res.Success = false;
+            res.Error = "Search failed for some reason :'(";
+        }
+        return res;
+    }
+
+    [HttpGet("General/{q}")]
+    public async Task<ServiceResponse<IEnumerable<QueryResponse>>> General([FromRoute] string q)
+    {
+        var res = new ServiceResponse<IEnumerable<QueryResponse>>();
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            throw new NotImplementedException();
+            //_logger.LogInformation("Search: \"{}\"", q);
+            //res.Data = await _query.EsportalUsernameSearch(q);
         }
         catch (Exception e)
         {
