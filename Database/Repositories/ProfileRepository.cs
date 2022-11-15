@@ -75,8 +75,19 @@ public static class ProfileRepository
             context.ProfileEntity.Attach(profile);
             profile.Recorded = DateTime.Now;
 
+            var newFriends = profileInput.Friends.Where(f => profile.Friends.FirstOrDefault(pf => pf.Id == f.Id) is null).ToList();
+            var removedAmount = profile.Friends.RemoveAll(f => profileInput.Friends.FirstOrDefault(pf => pf.Id == f.Id) is null);
+            profile.Friends.AddRange(newFriends);
+
+            profile.Stats = profileInput.Stats;
+            profile.RecentStats = profileInput.RecentStats;
+
+            var newOldUsernames = profile.OldUsernames.Where(u => profile.OldUsernames.FirstOrDefault(pu => pu.Id == u.Id) is null).ToList();
+            profile.OldUsernames.RemoveAll(u => profile.OldUsernames.FirstOrDefault(pu => pu.Id == u.Id) is null);
+            profile.OldUsernames.AddRange(newOldUsernames);
+
             var friendsInStringFormat = profile.Friends.Select(f => $"{f.Username}<{f.Id}>");
-            Console.WriteLine($"USER|{profile.Username}<{profile.Id}>| --> FRIENDS|{string.Join(",", friendsInStringFormat)}|");
+            Console.WriteLine($"USER|{profile.Username}<{profile.Id}>| --> FRIENDS|{string.Join(",", friendsInStringFormat)}| -- added {newFriends.Count}, removed {removedAmount}");
 
             await context.SaveChangesAsync();
             return true;
